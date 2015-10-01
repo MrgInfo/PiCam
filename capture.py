@@ -57,15 +57,8 @@ class MotionCapture:
     def __get_file_name(self):
         if not os.path.exists(self.image_dir):
             os.makedirs(self.image_dir)
-        right_now = datetime.datetime.now()
-        return "%s/%04d%02d%02d-%02d%02d%02d.h264" % (
-            self.image_dir,
-            right_now.year,
-            right_now.month,
-            right_now.day,
-            right_now.hour,
-            right_now.minute,
-            right_now.second)
+        now = datetime.datetime.now()
+        return os.path.join(self.image_dir, "{:%Y%m%d%H%M%S}.h264".format(now))
 
     def __capture(self, duration: int):
         filename = self.__get_file_name()
@@ -148,11 +141,11 @@ class MotionCapture:
                             diff_count += 1
                     if diff_count > self.sensitivity:
                         break
-                self.logger.debug("diff_count = %d" % diff_count)
+                self.logger.debug("diff_count = {}".format(diff_count))
                 if diff_count > self.sensitivity:
                     video_file = self.__smart_capture()
                     if video_file:
-                        self.logger.debug("Created video file {}.".format_map(video_file))
+                        self.logger.debug("Created video file {}.".format(video_file))
                         return video_file, diff_count
                 data1 = data2
                 time.sleep(self.frequency)
