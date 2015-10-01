@@ -29,6 +29,12 @@ class Database:
     def __del__(self):
         self.connection.close()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self):
+        self.connection.close()
+
     def dml(self, query: str):
         """
         Run data manipulation.
