@@ -1,8 +1,9 @@
 % rebase('layout.tpl', title='Monitor')
-
 <div class="jumbotron">
-    <h1>Szuterén</h1>
+% for item in streams:
+    <h1>{{item['name']}}</h1>
     <p>
-        <img src="http://wavepi.gotdns.org:8080/cam.mjpg" />
+        <img src="{{item['url']}}" />
     </p>
+% end
 </div>
