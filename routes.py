@@ -3,8 +3,8 @@
 Routes and views for the bottle application.
 """
 
+from database import Database
 from bottle import route, view
-import datetime
 
 __author__ = "wavezone"
 __email__ = "wavezone@mrginfo.com"
@@ -16,14 +16,11 @@ __version__ = "1.0"
 @route('/home')
 @view('index')
 def home():
-    return {
-        'events': [
-            {'time': datetime.datetime(2015, 2, 15, 15, 20, 0), 'camera': 'Szuterén', 'size': 54321,
-             'url': 'http://index.hu'},
-            {'time': datetime.datetime(2015, 10, 9, 3, 59, 23), 'camera': 'Teázó', 'size': 12345,
-             'url': 'http://origo.hu'},
-        ]
-    }
+    database = Database()
+    events = [{'time': time, 'camera': 'Szuterén', 'size': size, 'url': url}
+              for (file, time, size, url)
+              in database.query("SELECT file, time, size, url FROM events")]
+    return {'events': events}
 
 
 @route('/view')
