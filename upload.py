@@ -12,7 +12,7 @@ import logging
 
 from dropbox.client import DropboxClient
 
-from daemon import Daemon, console
+from bad_daemon import Daemon, console
 from database import Database
 import settings
 
