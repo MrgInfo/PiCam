@@ -4,28 +4,25 @@
 Dropbox upload daemon.
 """
 
-from time import strptime
+import os.path
 from operator import itemgetter
 from os import listdir
-import os.path
-import logging
+from time import strptime
 
-from dropbox.client import DropboxClient
+import dropbox
 
-from bad_daemon import Daemon, console
-from database import Database
 import settings
+from bad_daemon import DaemonBase, init
+from database import Database
 
-__all__ = ['UploadDaemon']
+__all__ = []
 __author__ = "wavezone"
 __email__ = "wavezone@mrginfo.com"
 __license__ = "GPL"
 __version__ = "1.0"
 
-OAUTH2_ACCESS_TOKEN = '3PJXWNTgRu8AAAAAAAASjHyifGwz-SPExoBgYAT2b7sO16Eo0RmqjvDIA5uValcG'
 
-
-class UploadDaemon(Daemon):
+class UploadDaemon(DaemonBase):
     """
     Dropbox upload daemon.
     """
@@ -33,14 +30,32 @@ class UploadDaemon(Daemon):
     max_size = 1024 ** 3 // 2
 
     def __init__(self, directory: str):
-        super().__init__('/var/run/upload.pid')
+        super().__init__()
         self.directory = directory
+        self.secret_file = os.path.join(self.directory, 'secret.txt')
+        if os.path.exists(self.secret_file):
+            with open(self.secret_file, 'r+') as file:
+                self.access_token = file.read()
+        else:
+            # noinspection SpellCheckingInspection
+            flow = dropbox.client.DropboxOAuth2FlowNoRedirect('m9cijknmu1po39d', 'bi8dlhif9215qg3')
+            authorize_url = flow.start()
+            print('1. Go to: {}'.format(authorize_url))
+            print('2. Click "Allow" (you might have to log in first).')
+            print('3. Copy the authorization code.')
+            code = input("Enter the authorization code here: ").strip()
+            self.access_token = flow.finish(code)
+            with open(self.secret_file, 'w+') as file:
+                file.write(self.access_token)
 
     def run(self):
-        self.logger.info("Uploading from %s to Dropbox." % self.directory)
+        """
+        Upload logic.
+        """
+        self.logger.info("Uploading from {} to Dropbox.".format(self.directory))
         try:
             # noinspection PyDeprecation
-            client = DropboxClient(OAUTH2_ACCESS_TOKEN)
+            client = dropbox.client.DropboxClient(self.access_token)
             while True:
                 # Get files from Dropbox:
                 metadata = client.metadata('/')
@@ -60,7 +75,7 @@ class UploadDaemon(Daemon):
                             share = client.share(local_name)
                         self.logger.debug("%s was uploaded to Dropbox." % filename)
                         with Database() as db:
-                            db.dml("UPDATE events SET url = '%s' WHERE file = '%s'" % (share['url'], filename))
+                            db.dml("UPDATE events SET url = '{}' WHERE file = '{}'".format(share['url'], filename))
                 # Rotate Dropbox in order to save storage:
                 total_size = sum(item['size'] for item in files)
                 files_history = sorted(files, key=itemgetter('modified'))
@@ -75,11 +90,5 @@ class UploadDaemon(Daemon):
 
 
 if __name__ == '__main__':
-    daemon = UploadDaemon(settings.working_dir())
-    if os.path.dirname(os.path.realpath(__file__)).startswith('/usr/local'):
-        console(daemon)
-    else:
-        stream = logging.StreamHandler()
-        stream.setLevel(logging.DEBUG)
-        daemon.logger.addHandler(stream)
-        daemon.run()
+    my_daemon = UploadDaemon(settings.working_dir())
+    init(my_daemon)

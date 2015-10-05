@@ -4,11 +4,13 @@
 A Simple mjpg stream http server for the Raspberry Pi Camera
 """
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from bad_daemon import DaemonBase, init
 import io
 import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
 import picamera
+
+from bad_daemon import DaemonBase, init
 
 __all__ = []
 __author__ = "wavezone"
@@ -72,6 +74,9 @@ class CameraDaemon(DaemonBase):
     """
 
     def run(self):
+        """
+        HTTP streaming logic.
+        """
         server = HTTPServer(('', 8080), CamHandler)
         with server.socket as socket:
             self.logger.info("Serving on {}".format(socket.getsockname()))
