@@ -42,6 +42,12 @@ class CamHandler(BaseHTTPRequestHandler):
         self.camera.close()
         self.server.socket.close()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self):
+        self.__del__()
+
     def do_GET(self):
         if self.path.endswith('.mjpg'):
             self.send_response(200, 'OK')
