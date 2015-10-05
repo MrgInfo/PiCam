@@ -58,18 +58,19 @@ class CamHandler(BaseHTTPRequestHandler):
             self.end_headers()
             # noinspection SpellCheckingInspection
             html = '''
-<!DOCTYPE HTML>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>PiCam</title>
-        <style>
-            html {overflow: hidden; height: 100%}
-            body {overflow: auto; width: 100%; margin: 0 auto; padding: 0 20px}
-        </style>
-    </head>
+<!DOCTYPE html>
+<html lang="en-US">
+    <meta charset="UTF-8">
+    <title>PiCam</title>
+    <style type="text/css">
+        .frame {background-color:#1122CC; text-align:center}
+        .frame img {margin: auto}
+        img {display:block}
+    </style>
     <body>
-        <img src="/cam.mjpg"/>
+        <div class="frame">
+            <img src="/cam.mjpg"/>
+        </div>
     </body>
 </html>
 '''
