@@ -31,23 +31,6 @@ class CamHandler(BaseHTTPRequestHandler):
     Camera stream.
     """
 
-    def __init__(self, request, client_address, srv):
-        super().__init__(request, client_address, srv)
-        self.camera = picamera.PiCamera()
-        self.camera.resolution = (1280, 720)  # (2592, 1944)
-        self.camera.framerate = 24
-        self.camera.brightness = 70
-
-    def __del__(self):
-        self.camera.close()
-        self.server.socket.close()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self):
-        self.__del__()
-
     def do_GET(self):
         if self.path.endswith('.mjpg'):
             self.send_response(200, 'OK')
@@ -55,17 +38,21 @@ class CamHandler(BaseHTTPRequestHandler):
             self.end_headers()
             stream = io.BytesIO()
             try:
-                for _ in self.camera.capture_continuous(stream, 'jpeg'):
-                    self.wfile.write(b'--boundary')
-                    self.send_header('Content-type', 'image/jpeg')
-                    self.send_header('Content-length', len(stream.getvalue()))
-                    self.end_headers()
-                    self.wfile.write(stream.getvalue())
-                    stream.seek(0)
-                    stream.truncate()
-                    time.sleep(.5)
-                    if self.request or self.wfile.closed:
-                        return
+                with picamera.PiCamera() as camera:
+                    camera.resolution = (1280, 720)  # (2592, 1944)
+                    camera.framerate = 24
+                    camera.brightness = 70
+                    for _ in camera.capture_continuous(stream, 'jpeg'):
+                        self.wfile.write(b'--boundary')
+                        self.send_header('Content-type', 'image/jpeg')
+                        self.send_header('Content-length', len(stream.getvalue()))
+                        self.end_headers()
+                        self.wfile.write(stream.getvalue())
+                        stream.seek(0)
+                        stream.truncate()
+                        time.sleep(.5)
+                        if self.request or self.wfile.closed:
+                            return
             except (KeyboardInterrupt, SystemExit):
                 pass
         else:
@@ -102,12 +89,13 @@ def _sig_handler(signum, frame):
 
 
 def _run():
-    with HTTPServer(('', 8080), CamHandler) as server:
-        logger.info("Serving on {}".format(server.sockets[0].getsockname()))
-        try:
-            server.serve_forever()
-        except KeyboardInterrupt:
-            pass
+    server = HTTPServer(('', 8080), CamHandler)
+    logger.info("Serving on {}".format(server.sockets[0].getsockname()))
+    try:
+        server.serve_forever()
+    finally:
+        logger.info("No longer serving.")
+        server.socket.close()
 
 
 if __name__ == '__main__':
