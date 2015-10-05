@@ -44,7 +44,7 @@ class UploadDaemon(DaemonBase):
             print('2. Click "Allow" (you might have to log in first).')
             print('3. Copy the authorization code.')
             code = input("Enter the authorization code here: ").strip()
-            self.access_token = flow.finish(code)
+            self.access_token, user_id = flow.finish(code)
             with open(self.secret_file, 'w+') as file:
                 file.write(self.access_token)
 
