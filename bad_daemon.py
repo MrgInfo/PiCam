@@ -5,15 +5,21 @@ In one of my project I need to program in Python 3 daemon. Maybe my code will be
 Executive part of the method is 'run' by just overloaded ..
 """
 
+from signal import SIGTERM
+from optparse import OptionParser
+from os import makedirs
+from os.path import exists, join
+from daemon import runner
+
 import sys
 import os
 import time
 import atexit
-from signal import SIGTERM
-
+import logging
+import logging.handlers
 import settings
 
-__all__ = ['Daemon', 'console']
+__all__ = ['Daemon', 'DaemonBase', 'console', 'init']
 __author__ = "wavezone"
 __email__ = "wavezone@mrginfo.com"
 __license__ = "GPL"
@@ -183,28 +189,28 @@ class Daemon(object):
         """
 
 
-def console(daemon: Daemon):
+def console(daemon_to_run: Daemon):
     """
     Start a daemon from console.
     """
-    if daemon is None:
+    if daemon_to_run is None:
         return
     if len(sys.argv) == 2:
-        daemon.logger.info('{} {}'.format(sys.argv[0], sys.argv[1]))
+        daemon_to_run.logger.info('{} {}'.format(sys.argv[0], sys.argv[1]))
         if 'start' == sys.argv[1]:
-            daemon.start()
+            daemon_to_run.start()
         elif 'stop' == sys.argv[1]:
-            daemon.stop()
+            daemon_to_run.stop()
         elif 'restart' == sys.argv[1]:
-            daemon.restart()
+            daemon_to_run.restart()
         elif 'status' == sys.argv[1]:
-            daemon.status()
+            daemon_to_run.status()
         else:
             print("Unknown command!")
             sys.exit(2)
         sys.exit(0)
     else:
-        daemon.logger.warning('show cmd daemon usage')
+        daemon_to_run.logger.warning('show cmd daemon usage')
         print("Usage: {} start|stop|restart".format(sys.argv[0]))
         sys.exit(2)
 
@@ -219,6 +225,89 @@ class MyDaemon(Daemon):
             time.sleep(1)
 
 
+class DaemonBase:
+    """
+    Base class for creating well behaving daemons.
+    """
+
+    def __init__(self):
+        self.stdin_path = '/dev/null'
+        self.stdout_path = '/dev/null'
+        self.stderr_path = '/dev/null'
+        # noinspection SpellCheckingInspection
+        self.pidfile_path = '/var/run/{}.pid'.format(self.__class__.__name__)
+        # noinspection SpellCheckingInspection
+        self.pidfile_timeout = 5
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.setLevel(logging.DEBUG)
+
+    # noinspection PyMethodMayBeStatic
+    def run(self):
+        """
+        You should override this method when you subclass Daemon.
+        It will be called after the process has been daemonized by start() or restart().
+
+        Example:
+
+        class MyDaemon(DaemonBase):
+            def run(self):
+                while True:
+                    time.sleep(1)
+        """
+
+
+def _interactive(camera_daemon: DaemonBase):
+    print("Starting server, use <Ctrl-C> to stop.")
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
+    camera_daemon.logger.addHandler(stream_handler)
+    try:
+        camera_daemon.run()
+    except KeyboardInterrupt:
+        pass
+
+
+def _background(camera_daemon: DaemonBase):
+    if not exists(LOG_DIR):
+        makedirs(LOG_DIR)
+    file_handler = logging.handlers.TimedRotatingFileHandler(
+        join(LOG_DIR, '{}.log'.format(camera_daemon.logger.name)),
+        when='midnight',
+        backupCount=10)
+    file_handler.setLevel(logging.INFO)
+    # noinspection SpellCheckingInspection
+    file_handler.setFormatter(
+        logging.Formatter(
+            fmt='%(asctime)s %(levelname)s %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'))
+    camera_daemon.logger.addHandler(file_handler)
+    daemon_runner = runner.DaemonRunner(camera_daemon)
+    daemon_runner.do_action()
+
+
+def init(skeleton: DaemonBase):
+    """
+    Initialize the Python program for running the particular daemon.
+    """
+    parser = OptionParser()
+    parser.add_option("-i", "--interactive", action="store_true", help="run in interactive console mode")
+    (options, args) = parser.parse_args()
+    if options.interactive:
+        _interactive(skeleton)
+    else:
+        _background(skeleton)
+
+
+class TwinkleDaemon(DaemonBase):
+    """
+    Example.
+    """
+
+    def run(self):
+        while True:
+            time.sleep(1)
+            self.logger.info('Twinkle')
+
 if __name__ == '__main__':
-    daemon = MyDaemon('/var/run/daemon.pid')
-    console(daemon)
+    daemon = TwinkleDaemon()
+    init(daemon)
