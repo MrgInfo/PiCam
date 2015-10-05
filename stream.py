@@ -99,9 +99,18 @@ def _run():
 
 if __name__ == '__main__':
     parser = OptionParser()
-    parser.add_option("-d", "--daemon", dest="daemon", help="Run in daemon mode.")
+    parser.add_option("-i", "--interactive", dest="interactive", help="Run in interactive console mode.")
     (options, args) = parser.parse_args()
-    if options.daemon:
+    if options.interactive:
+        print("Starting server, use <Ctrl-C> to stop.")
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.DEBUG)
+        logger.addHandler(stream_handler)
+        try:
+            _run()
+        except KeyboardInterrupt:
+            pass
+    else:
         if not exists(LOG_DIR):
             makedirs(LOG_DIR)
         file_handler = logging.handlers.TimedRotatingFileHandler(
@@ -119,12 +128,3 @@ if __name__ == '__main__':
         )
         with context:
             _run()
-    else:
-        print("Starting server, use <Ctrl-C> to stop.")
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.DEBUG)
-        logger.addHandler(stream_handler)
-        try:
-            _run()
-        except KeyboardInterrupt:
-            pass
