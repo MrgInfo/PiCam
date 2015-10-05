@@ -16,11 +16,13 @@ __version__ = "1.0"
 @route('/home')
 @view('index')
 def home():
-    database = Database()
-    events = [{'time': time, 'camera': 'Szuterén', 'size': size, 'url': url}
-              for (file, time, size, url)
-              in database.query("SELECT file, time, size, url FROM events")]
-    return {'events': events}
+    with Database() as database:
+        events = [
+            {'time': time, 'camera': 'Szuterén', 'size': size, 'url': url}
+            for (file, time, size, url)
+            in database.query("SELECT file, time, size, url FROM events")
+        ]
+        return {'events': events}
 
 
 @route('/view')
