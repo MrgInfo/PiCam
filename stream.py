@@ -99,7 +99,7 @@ def _run():
 
 if __name__ == '__main__':
     parser = OptionParser()
-    parser.add_option("-i", "--interactive", dest="interactive", help="Run in interactive console mode.")
+    parser.add_option("-i", "--interactive", action="store_true", help="run in interactive console mode")
     (options, args) = parser.parse_args()
     if options.interactive:
         print("Starting server, use <Ctrl-C> to stop.")
