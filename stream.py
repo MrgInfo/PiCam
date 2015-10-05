@@ -37,24 +37,21 @@ class CamHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--boundary')
             self.end_headers()
             stream = io.BytesIO()
-            try:
-                with picamera.PiCamera() as camera:
-                    camera.resolution = (1280, 720)  # (2592, 1944)
-                    camera.framerate = 24
-                    camera.brightness = 70
-                    for _ in camera.capture_continuous(stream, 'jpeg'):
-                        self.wfile.write(b'--boundary')
-                        self.send_header('Content-type', 'image/jpeg')
-                        self.send_header('Content-length', len(stream.getvalue()))
-                        self.end_headers()
-                        self.wfile.write(stream.getvalue())
-                        stream.seek(0)
-                        stream.truncate()
-                        time.sleep(.5)
-                        if self.request or self.wfile.closed:
-                            return
-            except (KeyboardInterrupt, SystemExit):
-                pass
+            with picamera.PiCamera() as camera:
+                camera.resolution = (1280, 720)  # (2592, 1944)
+                camera.framerate = 24
+                camera.brightness = 70
+                for _ in camera.capture_continuous(stream, 'jpeg'):
+                    self.wfile.write(b'--boundary')
+                    self.send_header('Content-type', 'image/jpeg')
+                    self.send_header('Content-length', len(stream.getvalue()))
+                    self.end_headers()
+                    self.wfile.write(stream.getvalue())
+                    stream.seek(0)
+                    stream.truncate()
+                    time.sleep(.5)
+                    if self.request or self.wfile.closed:
+                        return
         else:
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
@@ -121,10 +118,10 @@ if __name__ == '__main__':
         with context:
             _run()
     else:
+        print("Starting server, use <Ctrl-C> to stop.")
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.DEBUG)
         logger.addHandler(stream_handler)
-        print("Press Ctrl-C to exit...")
         try:
             _run()
         except KeyboardInterrupt:
