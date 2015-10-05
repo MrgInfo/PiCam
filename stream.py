@@ -64,14 +64,11 @@ class CamHandler(BaseHTTPRequestHandler):
     <meta charset="UTF-8">
     <title>PiCam</title>
     <style type="text/css">
-        img {display:block; width:1204px; height:768px; vertical-align:middle}
-        .frame {background-color:#E9967A; text-align:center; width:100%; height:100%}
-        .frame img {margin:auto}
+html {width:100%; height:100%; background:#E9967A}
+img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-top:-384px; margin-left:-512px}
     </style>
     <body>
-        <div class="frame">
-            <img src="/cam.mjpg" />
-        </div>
+        <img src="/cam.mjpg" />
     </body>
 </html>
 '''
