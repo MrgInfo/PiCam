@@ -38,7 +38,7 @@ class CamHandler(BaseHTTPRequestHandler):
             self.end_headers()
             stream = io.BytesIO()
             with picamera.PiCamera() as camera:
-                camera.resolution = (1280, 720)  # (2592, 1944)
+                camera.resolution = (2592, 1944) # (1280, 720)
                 camera.framerate = 24
                 camera.brightness = 70
                 for _ in camera.capture_continuous(stream, 'jpeg'):
