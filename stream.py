@@ -80,8 +80,8 @@ class CameraDaemon:
 
     def __init__(self):
         self.stdin_path = '/dev/null'
-        self.stdout_path = '/dev/null'
-        self.stderr_path = '/dev/null'
+        self.stdout_path = '/dev/tty'
+        self.stderr_path = '/dev/tty'
         # noinspection SpellCheckingInspection
         self.pidfile_path = '/var/run/{}.pid'.format(self.__class__.__name__)
         # noinspection SpellCheckingInspection
@@ -132,8 +132,8 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option("-i", "--interactive", action="store_true", help="run in interactive console mode")
     (options, args) = parser.parse_args()
-    d = CameraDaemon()
+    daemon = CameraDaemon()
     if options.interactive:
-        _interactive(d)
+        _interactive(daemon)
     else:
-        _background(d)
+        _background(daemon)
