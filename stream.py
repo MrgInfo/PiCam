@@ -90,12 +90,12 @@ def _sig_handler(signum, frame):
 
 def _run():
     server = HTTPServer(('', 8080), CamHandler)
-    logger.info("Serving on {}".format(server.sockets[0].getsockname()))
-    try:
-        server.serve_forever()
-    finally:
-        logger.info("No longer serving.")
-        server.socket.close()
+    with server.socket as socket:
+        logger.info("Serving on {}".format(socket.getsockname()))
+        try:
+            server.serve_forever()
+        finally:
+            logger.info("No longer serving.")
 
 
 if __name__ == '__main__':
