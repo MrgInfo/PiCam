@@ -33,14 +33,15 @@ class CamHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.endswith('.mjpg'):
-            self.send_response(200, 'OK')
+            self.send_response(200)
             self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--boundary')
             self.end_headers()
             stream = io.BytesIO()
             with picamera.PiCamera() as camera:
-                camera.resolution = (2592, 1944) # (1280, 720)
-                camera.framerate = 24
+                camera.resolution = (2592, 1944)
+                # camera.framerate = 24
                 camera.brightness = 70
+                time.sleep(2)  # Camera warm-up time
                 for _ in camera.capture_continuous(stream, 'jpeg'):
                     self.wfile.write(b'--boundary')
                     self.send_header('Content-type', 'image/jpeg')
@@ -49,7 +50,7 @@ class CamHandler(BaseHTTPRequestHandler):
                     self.wfile.write(stream.getvalue())
                     stream.seek(0)
                     stream.truncate()
-                    time.sleep(.5)
+                    time.sleep(.2)
                     if self.request or self.wfile.closed:
                         return
         else:
@@ -63,9 +64,9 @@ class CamHandler(BaseHTTPRequestHandler):
     <meta charset="UTF-8">
     <title>PiCam</title>
     <style type="text/css">
-        .frame {background-color:#E9967A; text-align:center}
+        img {display:block; width:1204px; height:768px; vertical-align:middle}
+        .frame {background-color:#E9967A; text-align:center; width:100%; height:100%}
         .frame img {margin:auto}
-        img {display:block; width:1204px; height:768px}
     </style>
     <body>
         <div class="frame">
