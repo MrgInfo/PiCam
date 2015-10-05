@@ -63,13 +63,13 @@ class CamHandler(BaseHTTPRequestHandler):
     <meta charset="UTF-8">
     <title>PiCam</title>
     <style type="text/css">
-        .frame {background-color:#1122CC; text-align:center}
-        .frame img {margin: auto}
-        img {display:block}
+        .frame {background-color:#E9967A; text-align:center}
+        .frame img {margin:auto}
+        img {display:block; width:1204px; height:768px}
     </style>
     <body>
         <div class="frame">
-            <img src="/cam.mjpg"/>
+            <img src="/cam.mjpg" />
         </div>
     </body>
 </html>
