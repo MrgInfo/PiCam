@@ -137,8 +137,9 @@ class CameraDaemon(DaemonBase):
             self.logger.info("Serving on {}".format(socket.getsockname()))
             try:
                 server.serve_forever()
-            finally:
+            except KeyboardInterrupt:
                 self.logger.info("No longer serving.")
+                server.shutdown()
 
 
 if __name__ == '__main__':
