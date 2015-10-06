@@ -9,7 +9,7 @@ import io
 import re
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from SocketServer import ThreadingMixIn
+from websocket_server import ThreadingMixIn
 
 import picamera
 
