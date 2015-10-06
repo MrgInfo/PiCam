@@ -9,6 +9,7 @@ import io
 import re
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from SocketServer import ThreadingMixIn
 
 import picamera
 
@@ -116,6 +117,12 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
             self.send_error(404, "File Not Found: {}".format(self.path))
 
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """
+    Handle requests in a separate thread.
+    """
+
+
 class CameraDaemon(DaemonBase):
     """
     Camera daemon.
@@ -125,7 +132,7 @@ class CameraDaemon(DaemonBase):
         """
         HTTP streaming logic.
         """
-        server = HTTPServer(('', 8080), CamHandler)
+        server = ThreadedHTTPServer(('', 8080), CamHandler)
         with server.socket as socket:
             self.logger.info("Serving on {}".format(socket.getsockname()))
             try:
