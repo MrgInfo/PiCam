@@ -20,7 +20,7 @@ __email__ = "wavezone@mrginfo.com"
 __license__ = "GPL"
 __version__ = "1.0"
 
-LOG_DIR = '/var/log/python/'
+LOG_DIR = '/var/log/PiCam/'
 
 
 class DaemonBase:
