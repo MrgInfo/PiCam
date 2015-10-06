@@ -12,7 +12,7 @@ __email__ = "wavezone@mrginfo.com"
 __license__ = "GPL"
 __version__ = "1.0"
 
-DEFAULT_DIR = '/var/local/motion'
+DEFAULT_DIR = '/var/local/PiCam'
 
 
 def working_dir() -> str:
