@@ -103,8 +103,6 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
             if self.path is None:
                 return
             path = re.sub('[^.a-zA-Z0-9]', "", str(self.path))
-            if path == "" or path[:1] == ".":
-                return
             if path.endswith('.jpg') or path.endswith('.jpeg'):
                 self._jpeg()
                 return
