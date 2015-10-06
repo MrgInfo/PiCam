@@ -122,6 +122,8 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     Handle requests in a separate thread.
     """
 
+    daemon_threads = True
+
 
 class CameraDaemon(DaemonBase):
     """
@@ -134,8 +136,8 @@ class CameraDaemon(DaemonBase):
         """
         server = ThreadedHTTPServer(('', 8080), CamHandler)
         with server.socket as socket:
-            self.logger.info("Serving on {}".format(socket.getsockname()))
             try:
+                self.logger.info("Serving on {}".format(socket.getsockname()))
                 server.serve_forever()
             except KeyboardInterrupt:
                 self.logger.info("No longer serving.")
