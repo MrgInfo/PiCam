@@ -24,35 +24,44 @@ class CamHandler(BaseHTTPRequestHandler):
     Camera HTTP stream.
     """
 
-    def do_GET(self):
-        if self.path.endswith('.mjpg'):
-            self.send_response(200)
-            self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--boundary')
-            self.end_headers()
-            stream = io.BytesIO()
-            with picamera.PiCamera() as camera:
-                camera.resolution = (1280, 720)
-                camera.framerate = 30
-                camera.brightness = 70
-                time.sleep(2)  # Camera warm-up time
-                for _ in camera.capture_continuous(stream, 'jpeg'):
-                    self.wfile.write(b'--boundary')
-                    self.send_header('Content-type', 'image/jpeg')
-                    self.send_header('Content-length', len(stream.getvalue()))
-                    self.end_headers()
-                    self.wfile.write(stream.getvalue())
-                    stream.seek(0)
-                    stream.truncate()
-                    time.sleep(.2)
-                    if self.request or self.wfile.closed:
-                        return
-        else:
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            # noinspection SpellCheckingInspection
-            html = '''
-<!DOCTYPE html>
+    def _jpeg(self):
+        stream = io.BytesIO()
+        with picamera.PiCamera() as camera:
+            camera.resolution = (2592, 1944)
+            camera.brightness = 70
+            camera.capture(stream, 'jpeg')
+        self.send_response(200)
+        self.send_header('Content-type', 'image/jpeg')
+        self.send_header('Content-length', len(stream.getvalue()))
+        self.end_headers()
+        self.wfile.write(stream.getvalue())
+
+    def _mjpg(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--boundary')
+        self.end_headers()
+        stream = io.BytesIO()
+        with picamera.PiCamera() as camera:
+            camera.resolution = (1280, 720)
+            camera.framerate = 30
+            camera.brightness = 70
+            time.sleep(2)  # Camera warm-up time
+            for _ in camera.capture_continuous(stream, 'jpeg'):
+                self.wfile.write(b'--boundary')
+                self.send_header('Content-type', 'image/jpeg')
+                self.send_header('Content-length', len(stream.getvalue()))
+                self.end_headers()
+                self.wfile.write(stream.getvalue())
+                stream.seek(0)
+                stream.truncate()
+                time.sleep(.2)
+                if not self.request \
+                        or self.wfile.closed:
+                    return
+
+    def _html(self):
+        # noinspection SpellCheckingInspection
+        html = '''<!DOCTYPE html>
 <html lang="en-US">
     <meta charset="UTF-8">
     <title>PiCam</title>
@@ -63,9 +72,19 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
     <body>
         <img src="/cam.mjpg" />
     </body>
-</html>
-'''
-            self.wfile.write(html.encode('utf-8'))
+</html>'''
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(html.encode('utf-8'))
+
+    def do_GET(self):
+        if self.path.endswith('.jpg') or self.path.endswith('.jpeg'):
+            self._jpeg()
+        elif self.path.endswith('.mjpg'):
+            self._mjpg()
+        else:
+            self._html()
 
 
 class CameraDaemon(DaemonBase):
