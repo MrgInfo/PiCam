@@ -47,6 +47,7 @@ class CamHandler(BaseHTTPRequestHandler):
             camera.brightness = 70
             time.sleep(2)  # Camera warm-up time
             for _ in camera.capture_continuous(stream, 'jpeg'):
+                self.logger.debug()
                 self.wfile.write(b'--boundary')
                 self.send_header('Content-type', 'image/jpeg')
                 self.send_header('Content-length', len(stream.getvalue()))
@@ -55,8 +56,7 @@ class CamHandler(BaseHTTPRequestHandler):
                 stream.seek(0)
                 stream.truncate()
                 time.sleep(.2)
-                if not self.request \
-                        or self.wfile.closed:
+                if self.wfile.closed:
                     return
 
     def _html(self):
