@@ -106,7 +106,10 @@ class TwinkleDaemon(DaemonBase):
     def run(self):
         while True:
             time.sleep(1)
-            self.logger.info('Twinkle')
+            try:
+                self.logger.info('Twinkle')
+            except Exception as e:
+                print(e)
 
 
 if __name__ == '__main__':
