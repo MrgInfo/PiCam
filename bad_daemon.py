@@ -55,41 +55,30 @@ class DaemonBase:
         """
 
 
-def _interactive(camera_daemon: DaemonBase):
+def _interactive(a_daemon: DaemonBase):
     print("Starting server, use <Ctrl-C> to stop.")
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.DEBUG)
-    camera_daemon.logger.addHandler(stream_handler)
-
-    file_handler = ConcurrentRotatingFileHandler(
-        join(LOG_DIR, '{}.log'.format(camera_daemon.logger.name)), "a", 512 * 1024, 5)
-    file_handler.setLevel(logging.INFO)
-    # noinspection SpellCheckingInspection
-    file_handler.setFormatter(
-        logging.Formatter(
-            fmt='%(asctime)s %(levelname)s %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'))
-    camera_daemon.logger.addHandler(file_handler)
-
+    a_daemon.logger.addHandler(stream_handler)
     try:
-        camera_daemon.run()
+        a_daemon.run()
     except KeyboardInterrupt:
         pass
 
 
-def _background(camera_daemon: DaemonBase):
+def _background(a_daemon: DaemonBase):
     if not exists(LOG_DIR):
         makedirs(LOG_DIR)
-    file_handler = ConcurrentRotatingFileHandler(
-        join(LOG_DIR, '{}.log'.format(camera_daemon.logger.name)), "a", 512 * 1024, 5)
+    name = join(LOG_DIR, '{}.log'.format(a_daemon.logger.name))
+    file_handler = ConcurrentRotatingFileHandler(name, "a", 512 * 1024, 5)
     file_handler.setLevel(logging.INFO)
     # noinspection SpellCheckingInspection
     file_handler.setFormatter(
         logging.Formatter(
             fmt='%(asctime)s %(levelname)s %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'))
-    camera_daemon.logger.addHandler(file_handler)
-    daemon_runner = runner.DaemonRunner(camera_daemon)
+    a_daemon.logger.addHandler(file_handler)
+    daemon_runner = runner.DaemonRunner(a_daemon)
     daemon_runner.do_action()
 
 
@@ -100,10 +89,13 @@ def init(skeleton: DaemonBase):
     parser = OptionParser()
     parser.add_option("-i", "--interactive", action="store_true", help="run in interactive console mode")
     (options, args) = parser.parse_args()
-    if options.interactive:
-        _interactive(skeleton)
-    else:
-        _background(skeleton)
+    try:
+        if options.interactive:
+            _interactive(skeleton)
+        else:
+            _background(skeleton)
+    except Exception as e:
+        print(e)
 
 
 class TwinkleDaemon(DaemonBase):
