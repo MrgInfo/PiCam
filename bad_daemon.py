@@ -31,8 +31,8 @@ class DaemonBase:
 
     def __init__(self):
         self.stdin_path = '/dev/null'
-        self.stdout_path = '/dev/null'
-        self.stderr_path = '/dev/null'
+        self.stdout_path = '/var/log/daemon.inf'
+        self.stderr_path = '/var/log/daemon.err'
         # noinspection SpellCheckingInspection
         self.pidfile_path = '/var/run/{}.pid'.format(self.__class__.__name__)
         # noinspection SpellCheckingInspection
