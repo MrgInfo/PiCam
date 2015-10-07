@@ -5,6 +5,7 @@ In one of my project I need to program in Python 3 daemon. Maybe my code will be
 Executive part of the method is 'run' by just overloaded ..
 """
 
+import sys
 import logging
 import logging.handlers
 import time
@@ -12,7 +13,6 @@ from cloghandler import ConcurrentRotatingFileHandler
 from optparse import OptionParser
 from os import makedirs
 from os.path import exists, join
-
 from daemon import runner
 
 __all__ = ['DaemonBase', 'init']
@@ -108,8 +108,8 @@ class TwinkleDaemon(DaemonBase):
             time.sleep(1)
             try:
                 self.logger.info('Twinkle')
-            except Exception as e:
-                print(e)
+            except Exception:
+                print(sys.exc_info())
 
 
 if __name__ == '__main__':
