@@ -60,6 +60,17 @@ def _interactive(camera_daemon: DaemonBase):
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.DEBUG)
     camera_daemon.logger.addHandler(stream_handler)
+
+    file_handler = ConcurrentRotatingFileHandler(
+        join(LOG_DIR, '{}.log'.format(camera_daemon.logger.name)), "a", 512 * 1024, 5)
+    file_handler.setLevel(logging.INFO)
+    # noinspection SpellCheckingInspection
+    file_handler.setFormatter(
+        logging.Formatter(
+            fmt='%(asctime)s %(levelname)s %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'))
+    camera_daemon.logger.addHandler(file_handler)
+
     try:
         camera_daemon.run()
     except KeyboardInterrupt:
