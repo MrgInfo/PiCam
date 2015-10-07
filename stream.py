@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+### BEGIN INIT INFO
+# Provides:          stream
+# Required-Start:    $network $remote_fs
+# Required-Stop:     $network $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: HTTP video stream
+### END INIT INFO
 """
 A Simple mjpg stream http server for the Raspberry Pi Camera
 """
