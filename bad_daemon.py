@@ -8,6 +8,7 @@ Executive part of the method is 'run' by just overloaded ..
 import logging
 import logging.handlers
 import time
+from cloghandler import ConcurrentRotatingFileHandler
 from optparse import OptionParser
 from os import makedirs
 from os.path import exists, join
@@ -68,10 +69,8 @@ def _interactive(camera_daemon: DaemonBase):
 def _background(camera_daemon: DaemonBase):
     if not exists(LOG_DIR):
         makedirs(LOG_DIR)
-    file_handler = logging.handlers.TimedRotatingFileHandler(
-        join(LOG_DIR, '{}.log'.format(camera_daemon.logger.name)),
-        when='midnight',
-        backupCount=10)
+    file_handler = ConcurrentRotatingFileHandler(
+        join(LOG_DIR, '{}.log'.format(camera_daemon.logger.name)), "a", 512 * 1024, 5)
     file_handler.setLevel(logging.INFO)
     # noinspection SpellCheckingInspection
     file_handler.setFormatter(

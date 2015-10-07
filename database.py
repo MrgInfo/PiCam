@@ -32,7 +32,8 @@ class Database:
     def __enter__(self):
         return self
 
-    def __exit__(self):
+    # noinspection PyUnusedLocal
+    def __exit__(self, exception_type, exception_value, traceback):
         self.connection.close()
 
     def dml(self, query: str):
