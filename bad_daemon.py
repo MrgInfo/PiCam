@@ -82,18 +82,18 @@ def _background(a_daemon: DaemonBase):
     daemon_runner.do_action()
 
 
-def init(skeleton: DaemonBase):
+def init(a_daemon: DaemonBase):
     """
     Initialize the Python program for running the particular daemon.
     """
-    parser = OptionParser()
-    parser.add_option("-i", "--interactive", action="store_true", help="run in interactive console mode")
-    (options, args) = parser.parse_args()
     try:
+        parser = OptionParser()
+        parser.add_option("-i", "--interactive", action="store_true", help="run in interactive console mode")
+        (options, args) = parser.parse_args()
         if options.interactive:
-            _interactive(skeleton)
+            _interactive(a_daemon)
         else:
-            _background(skeleton)
+            _background(a_daemon)
     except Exception as e:
         print(e)
 
