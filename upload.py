@@ -20,8 +20,8 @@ from time import strptime
 import dropbox
 
 import settings
-from bad_daemon import DaemonBase, init
-from database import Database
+from utils.daemon import DaemonBase, init
+from utils.database import Database
 
 __all__ = []
 __author__ = "wavezone"

@@ -3,8 +3,9 @@
 Routes and views for the bottle application.
 """
 
-from database import Database
 from bottle import route, view
+
+from utils.database import Database
 
 __author__ = "wavezone"
 __email__ = "wavezone@mrginfo.com"

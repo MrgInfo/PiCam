@@ -5,11 +5,10 @@ In one of my project I need to program in Python 3 daemon. Maybe my code will be
 Executive part of the method is 'run' by just overloaded ..
 """
 
-import sys
 import logging
-import logging.handlers
+from logging.handlers import RotatingFileHandler
 import time
-from cloghandler import ConcurrentRotatingFileHandler
+
 from optparse import OptionParser
 from os import makedirs
 from os.path import exists, join
@@ -70,7 +69,7 @@ def _background(a_daemon: DaemonBase):
     if not exists(LOG_DIR):
         makedirs(LOG_DIR)
     name = join(LOG_DIR, '{}.log'.format(a_daemon.logger.name))
-    file_handler = ConcurrentRotatingFileHandler(name, "a", 512 * 1024, 5)
+    file_handler = RotatingFileHandler(name, "a", 512 * 1024, 5)
     file_handler.setLevel(logging.INFO)
     # noinspection SpellCheckingInspection
     file_handler.setFormatter(
