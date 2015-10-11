@@ -13,7 +13,6 @@ Daemon for detecting motion.
 """
 
 import datetime
-import logging
 import os
 import time
 from fractions import Fraction
@@ -49,7 +48,7 @@ class MotionCapture:
     short_duration = 15  # capture short video duration is seconds
     long_duration = 120  # capture long video duration in seconds
 
-    def __init__(self, image_dir: str, is_day: bool = True, logger: logging.Logger = None):
+    def __init__(self, image_dir: str, is_day: bool = True):
         self.last_video = 0
         self.state = ''
         self.image_width = 1920
@@ -58,11 +57,6 @@ class MotionCapture:
         self.imageHFlip = False  # Flip image Horizontally
         self.image_dir = image_dir
         self.is_day = is_day
-        if logger is None:
-            self.logger = logging.getLogger(self.__class__.__name__)
-            self.logger.setLevel(logging.DEBUG)
-        else:
-            self.logger = logger
 
     def __get_file_name(self):
         if not os.path.exists(self.image_dir):
@@ -160,11 +154,10 @@ class MotionCapture:
                                 diff_count += 1
                         if diff_count > self.sensitivity:
                             break
-                    self.logger.debug("diff_count = {}".format(diff_count))
                     if diff_count > self.sensitivity:
                         video_file = self.__smart_capture()
                         if video_file:
-                            self.logger.info("Created video file {}.".format(video_file))
+                            print("Created video file {}.".format(video_file))
                             return video_file, diff_count
                 data1 = data2
                 time.sleep(self.frequency)
@@ -185,15 +178,15 @@ class MotionDaemon(DaemonBase):
         """
         Capture logic.
         """
-        self.logger.info("Detecting curious motion.")
+        print("Detecting curious motion.")
         with Database() as db:
             try:
-                motion = MotionCapture(self.directory, logger=self.logger)
+                motion = MotionCapture(self.directory)
                 for (file, diff) in motion:
                     size = os.path.getsize(file)
                     db.dml("INSERT INTO events(file, size, diff_cnt) VALUES ('{}', {}, {})".format(file, size, diff))
             finally:
-                self.logger.info("No longer detecting motion.")
+                print("No longer detecting motion.")
 
 
 if __name__ == '__main__':

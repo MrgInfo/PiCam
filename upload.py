@@ -60,7 +60,7 @@ class UploadDaemon(DaemonBase):
         """
         Upload logic.
         """
-        self.logger.info("Uploading from {} to Dropbox.".format(self.directory))
+        print("Uploading from {} to Dropbox.".format(self.directory))
         try:
             # noinspection PyDeprecation
             client = dropbox.client.DropboxClient(self.access_token)
@@ -81,7 +81,7 @@ class UploadDaemon(DaemonBase):
                         with open(os.path.join(self.directory, filename), 'rb') as file_stream:
                             client.put_file(local_name, file_stream)
                             share = client.share(local_name)
-                        self.logger.debug("%s was uploaded to Dropbox." % filename)
+                        print("%s was uploaded to Dropbox." % filename)
                         with Database() as db:
                             db.dml("UPDATE events SET url = '{}' WHERE file = '{}'".format(share['url'], filename))
                 # Rotate Dropbox in order to save storage:
@@ -91,10 +91,10 @@ class UploadDaemon(DaemonBase):
                     if total_size < self.max_size:
                         break
                     client.file_delete(file['file'])
-                    self.logger.debug("%s was deleted from Dropbox." % file['file'])
+                    print("%s was deleted from Dropbox." % file['file'])
                     total_size -= file['size']
         finally:
-            self.logger.info("No longer uploading from %s to Dropbox." % self.directory)
+            print("No longer uploading from %s to Dropbox." % self.directory)
 
 
 if __name__ == '__main__':
