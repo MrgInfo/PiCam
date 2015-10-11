@@ -21,7 +21,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import picamera
 from websocket_server import ThreadingMixIn
 
-from utils.daemon import DaemonBase, init
+from utils.daemons import DaemonBase, init
 
 __all__ = []
 __author__ = "wavezone"

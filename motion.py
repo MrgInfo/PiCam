@@ -22,7 +22,7 @@ import picamera
 import picamera.array
 
 import settings
-from utils.daemon import DaemonBase, init
+from utils.daemons import DaemonBase, init
 from utils.database import Database
 
 __all__ = []
