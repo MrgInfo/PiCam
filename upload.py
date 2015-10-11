@@ -40,7 +40,7 @@ class UploadDaemon(DaemonBase):
     def __init__(self, directory: str):
         super().__init__()
         self.directory = directory
-        self.secret_file = os.path.join(self.directory, 'secret.txt')
+        self.secret_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'secret.txt')
         if os.path.exists(self.secret_file):
             with open(self.secret_file, 'r+') as file:
                 self.access_token = file.read()
