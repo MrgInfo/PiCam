@@ -13,6 +13,7 @@ __license__ = "GPL"
 __version__ = "1.0"
 
 
+# noinspection SpellCheckingInspection
 @route('/')
 @route('/home')
 @view('index')
@@ -26,6 +27,7 @@ def home():
         return {'events': events}
 
 
+# noinspection SpellCheckingInspection
 @route('/view')
 @view('view')
 def view():

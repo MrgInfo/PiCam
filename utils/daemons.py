@@ -6,7 +6,7 @@ Executive part of the method is 'run' by just overloaded ..
 """
 
 import logging
-from logging.handlers import RotatingFileHandler
+from cloghandler import ConcurrentRotatingFileHandler
 import time
 
 from optparse import OptionParser
@@ -69,7 +69,7 @@ def _background(a_daemon: DaemonBase):
     if not exists(LOG_DIR):
         makedirs(LOG_DIR)
     name = join(LOG_DIR, '{}.log'.format(a_daemon.logger.name))
-    file_handler = RotatingFileHandler(name, "a", 512 * 1024, 5)
+    file_handler = ConcurrentRotatingFileHandler(name, "a", 512 * 1024, 5)
     file_handler.setLevel(logging.INFO)
     # noinspection SpellCheckingInspection
     file_handler.setFormatter(
