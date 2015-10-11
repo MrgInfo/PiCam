@@ -6,6 +6,7 @@ Executive part of the method is 'run' by just overloaded ..
 """
 
 import logging
+import traceback
 from cloghandler import ConcurrentRotatingFileHandler
 import time
 
@@ -85,6 +86,7 @@ def init(a_daemon: DaemonBase):
     """
     Initialize the Python program for running the particular daemon.
     """
+    # noinspection PyBroadException
     try:
         parser = OptionParser()
         parser.add_option("-i", "--interactive", action="store_true", help="run in interactive console mode")
@@ -93,8 +95,8 @@ def init(a_daemon: DaemonBase):
             _interactive(a_daemon)
         else:
             _background(a_daemon)
-    except Exception as e:
-        print(e)
+    except Exception:
+        print(traceback.format_exc())
 
 
 class TwinkleDaemon(DaemonBase):
