@@ -8,8 +8,8 @@
 # Default-Stop:      0 1 6
 # Short-Description: HTTP video stream
 ### END INIT INFO
-"""
-A Simple mjpg stream http server for the Raspberry Pi Camera
+
+"""A Simple mjpg stream http server for the Raspberry Pi Camera
 """
 
 import datetime
@@ -23,17 +23,18 @@ from websocket_server import ThreadingMixIn
 
 from utils.daemons import DaemonBase, init
 
-__all__ = []
 __author__ = "wavezone"
-__email__ = "wavezone@mrginfo.com"
+__copyright__ = "Copyright 2015, MRG-Infó Bt."
+__credits__ = ["Groma István (wavezone)"]
+
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.0.1"
+__maintainer__ = "Groma István"
+__email__ = "wavezone@mrginfo.com"
 
 
 class CamHandler(BaseHTTPRequestHandler):
-    """
-    Camera HTTP stream.
-    """
+    """Camera HTTP stream."""
 
     def _jpeg(self):
         stream = io.BytesIO()
@@ -124,22 +125,16 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
-    """
-    Handle requests in a separate thread.
-    """
+    """Handle requests in a separate thread."""
 
     daemon_threads = True
 
 
 class CameraDaemon(DaemonBase):
-    """
-    Camera daemon.
-    """
+    """Camera daemon."""
 
     def run(self):
-        """
-        HTTP streaming logic.
-        """
+        """HTTP streaming logic."""
         server = ThreadedHTTPServer(('', 8080), CamHandler)
         with server.socket as socket:
             try:

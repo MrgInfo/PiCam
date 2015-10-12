@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Basic settings.
+
+"""Basic settings.
 """
 
 from os.path import exists
 
-__all__ = ['working_dir']
 __author__ = "wavezone"
-__email__ = "wavezone@mrginfo.com"
+__copyright__ = "Copyright 2015, MRG-Infó Bt."
+__credits__ = ["Groma István (wavezone)"]
+
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.0.1"
+__maintainer__ = "Groma István"
+__email__ = "wavezone@mrginfo.com"
+
+__all__ = ['working_dir']
 
 DEFAULT_DIR = '/var/local/PiCam'
 

@@ -1,7 +1,8 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-This script runs the application using a development server.
+
+
+"""This script runs the application using a development server.
 """
 
 import os
@@ -10,7 +11,16 @@ import sys
 import routes
 import bottle
 
-if '--debug' in sys.argv[1:] or 'SERVER_DEBUG' in os.environ:
+__author__ = "wavezone"
+__copyright__ = "Copyright 2015, MRG-Infó Bt."
+__credits__ = ["Groma István (wavezone)"]
+
+__license__ = "GPL"
+__version__ = "1.0.1"
+__maintainer__ = "Groma István"
+__email__ = "wavezone@mrginfo.com"
+
+if ('--debug' in sys.argv[1:]) or ('SERVER_DEBUG' in os.environ):
     # Debug mode will enable more verbose output in the console window.
     # It must be set at the beginning of the script.
     bottle.debug(True)

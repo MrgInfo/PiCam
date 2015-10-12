@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-In one of my project I need to program in Python 3 daemon. Maybe my code will be useful to someone.
-Executive part of the method is 'run' by just overloaded ..
+
+"""In one of my project I need to program in Python 3 daemon.
 """
 
 import traceback
@@ -13,17 +12,20 @@ from optparse import OptionParser
 import sys
 from daemon import runner
 
-__all__ = ['DaemonBase', 'init']
 __author__ = "wavezone"
-__email__ = "wavezone@mrginfo.com"
+__copyright__ = "Copyright 2015, MRG-Infó Bt."
+__credits__ = ["Groma István (wavezone)"]
+
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.0.1"
+__maintainer__ = "Groma István"
+__email__ = "wavezone@mrginfo.com"
+
+__all__ = ['DaemonBase', 'init']
 
 
 class DaemonBase:
-    """
-    Base class for creating well behaving daemons.
-    """
+    """Base class for creating well behaving daemons."""
 
     def __init__(self):
         self.stdin_path = '/dev/null'
@@ -36,8 +38,7 @@ class DaemonBase:
 
     # noinspection PyMethodMayBeStatic
     def run(self):
-        """
-        You should override this method when you subclass Daemon.
+        """You should override this method when you subclass Daemon.
         It will be called after the process has been daemonized by start() or restart().
 
         Example:
@@ -47,6 +48,15 @@ class DaemonBase:
                 while True:
                     time.sleep(1)
         """
+
+
+class TwinkleDaemon(DaemonBase):
+    """Example."""
+
+    def run(self):
+        while True:
+            time.sleep(1)
+            print('Twinkle')
 
 
 def _interactive(a_daemon: DaemonBase):
@@ -63,9 +73,7 @@ def _background(a_daemon: DaemonBase):
 
 
 def init(a_daemon: DaemonBase):
-    """
-    Initialize the Python program for running the particular daemon.
-    """
+    """Initialize the Python program for running the particular daemon."""
     # noinspection PyBroadException
     try:
         parser = OptionParser()
@@ -77,17 +85,6 @@ def init(a_daemon: DaemonBase):
             _background(a_daemon)
     except Exception:
         print(traceback.format_exc(), file=sys.stderr)
-
-
-class TwinkleDaemon(DaemonBase):
-    """
-    Example.
-    """
-
-    def run(self):
-        while True:
-            time.sleep(1)
-            print('Twinkle')
 
 
 if __name__ == '__main__':

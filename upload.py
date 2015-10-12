@@ -8,8 +8,8 @@
 # Default-Stop:      0 1 6
 # Short-Description: Dropbox upload daemon
 ### END INIT INFO
-"""
-Dropbox upload daemon.
+
+"""Dropbox upload daemon.
 """
 
 import os.path
@@ -19,21 +19,22 @@ from time import strptime
 
 import dropbox
 
-import settings
+from utils import settings
 from utils.daemons import DaemonBase, init
 from utils.database import Database
 
-__all__ = []
 __author__ = "wavezone"
-__email__ = "wavezone@mrginfo.com"
+__copyright__ = "Copyright 2015, MRG-Infó Bt."
+__credits__ = ["Groma István (wavezone)"]
+
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.0.1"
+__maintainer__ = "Groma István"
+__email__ = "wavezone@mrginfo.com"
 
 
 class UploadDaemon(DaemonBase):
-    """
-    Dropbox upload daemon.
-    """
+    """Dropbox upload daemon."""
 
     max_size = 1024 ** 3 // 2
 
@@ -57,9 +58,7 @@ class UploadDaemon(DaemonBase):
                 file.write(self.access_token)
 
     def run(self):
-        """
-        Upload logic.
-        """
+        """Upload logic."""
         print("Uploading from {} to Dropbox.".format(self.directory))
         try:
             # noinspection PyDeprecation

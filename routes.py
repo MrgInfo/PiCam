@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Routes and views for the bottle application.
+
+"""Routes and views for the bottle application.
 """
 
 from bottle import route, view
@@ -8,9 +8,13 @@ from bottle import route, view
 from utils.database import Database
 
 __author__ = "wavezone"
-__email__ = "wavezone@mrginfo.com"
+__copyright__ = "Copyright 2015, MRG-Infó Bt."
+__credits__ = ["Groma István (wavezone)"]
+
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.0.1"
+__maintainer__ = "Groma István"
+__email__ = "wavezone@mrginfo.com"
 
 
 # noinspection SpellCheckingInspection

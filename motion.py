@@ -8,33 +8,36 @@
 # Default-Stop:      0 1 6
 # Short-Description: Detecting motion
 ### END INIT INFO
-"""
-Daemon for detecting motion.
+
+"""Daemon for detecting motion.
 """
 
 import datetime
 import os
 import time
 from fractions import Fraction
+
 import picamera
 import picamera.array
-import settings
+
+from utils import settings
 from utils.daemons import DaemonBase, init
 from utils.database import Database
 
-__all__ = []
 __author__ = "wavezone"
-__email__ = "wavezone@mrginfo.com"
+__copyright__ = "Copyright 2015, MRG-Infó Bt."
+__credits__ = ["Groma István (wavezone)"]
+
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.0.1"
+__maintainer__ = "Groma István"
+__email__ = "wavezone@mrginfo.com"
 
 SECONDS2MICRO = 1000000  # Constant for converting Shutter Speed in Seconds to Microseconds
 
 
 class MotionCapture:
-    """
-    Detect motion on PiCam and capture short video.
-    """
+    """Detect motion on PiCam and capture short video."""
 
     threshold = 10  # How Much pixel changes
     sensitivity = 100  # How many pixels change
@@ -164,18 +167,14 @@ class MotionCapture:
 
 
 class MotionDaemon(DaemonBase):
-    """
-    Daemon for detecting motion.
-    """
+    """Daemon for detecting motion."""
 
     def __init__(self, directory: str):
         super().__init__()
         self.directory = directory
 
     def run(self):
-        """
-        Capture logic.
-        """
+        """Capture logic."""
         print("Detecting curious motion.")
         with Database() as db:
             try:
