@@ -16,9 +16,7 @@ import os.path
 from operator import itemgetter
 from os import listdir
 from time import strptime
-
 import dropbox
-
 from utils import settings
 from utils.daemons import DaemonBase, init
 from utils.database import Database
@@ -82,7 +80,13 @@ class UploadDaemon(DaemonBase):
                             share = client.share(local_name)
                         print("%s was uploaded to Dropbox." % filename)
                         with Database() as db:
-                            db.dml("UPDATE events SET url = '{}' WHERE file = '{}'".format(share['url'], filename))
+                            update = """
+                            UPDATE events
+                               SET url = '{}',
+                                   uploaded = current_timestamp
+                             WHERE file = '{}'
+                            """.format(share['url'], filename)
+                            db.dml(update)
                 # Rotate Dropbox in order to save storage:
                 total_size = sum(item['size'] for item in files)
                 files_history = sorted(files, key=itemgetter('modified'))

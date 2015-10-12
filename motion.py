@@ -181,7 +181,19 @@ class MotionDaemon(DaemonBase):
                 motion = MotionCapture(self.directory)
                 for (file, diff) in motion:
                     size = os.path.getsize(file)
-                    db.dml("INSERT INTO events(file, size, diff_cnt) VALUES ('{}', {}, {})".format(file, size, diff))
+                    insert = """
+                    INSERT INTO events(
+                        file,
+                        size,
+                        diff_cnt,
+                        time)
+                    VALUES (
+                        '{}',
+                        {},
+                        {},
+                        current_timestamp)
+                    """.format(file, size, diff)
+                    db.dml(insert)
             finally:
                 print("No longer detecting motion.")
 
