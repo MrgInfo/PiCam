@@ -15,6 +15,7 @@ apache2.conf:
     </VirtualHost>
 """
 
+import os
 import bottle
 # noinspection PyUnresolvedReferences
 import routes
@@ -27,5 +28,7 @@ __license__ = "GPL"
 __version__ = "1.0.1"
 __maintainer__ = "Groma István"
 __email__ = "wavezone@mrginfo.com"
+
+bottle.TEMPLATE_PATH.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 application = bottle.default_app()
