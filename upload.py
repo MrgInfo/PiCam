@@ -12,10 +12,11 @@
 """Dropbox upload daemon.
 """
 
+import urllib3
 import os.path
 from operator import itemgetter
 from os import listdir
-from time import strptime
+from time import strptime, sleep
 import dropbox
 from utils import settings
 from utils.daemons import DaemonBase, init
@@ -63,7 +64,11 @@ class UploadDaemon(DaemonBase):
             client = dropbox.client.DropboxClient(self.access_token)
             while True:
                 # Get files from Dropbox:
-                metadata = client.metadata('/')
+                try:
+                    metadata = client.metadata('/')
+                except urllib3.exceptions.MaxRetryError:
+                    sleep(10)
+                    continue
                 files = [{'file': m['path'], 'modified': strptime(m['modified'], '%a, %d %b %Y %H:%M:%S %z'),
                           'size': m['bytes']} for m in metadata['contents'] if not m['is_dir']]
                 # Upload new files from directory:

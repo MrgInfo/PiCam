@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS events (
   PRIMARY KEY (file)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-CREATE USER 'pi'@'localhost';
-RANT ALL ON motion.* TO 'pi'@'localhost';
+CREATE USER 'picam'@'localhost';
+GRANT ALL ON motion.* TO 'picam'@'localhost';
 """
 
 import pymysql
@@ -38,15 +38,17 @@ class Database:
     """Wrapper class for database."""
 
     db = 'motion'
-    user = 'pi'
-    host = 'localhost'
+    user = 'picam'
 
     def __init__(self):
-        self.connection = pymysql.connect(host=self.host, user=self.user, db=self.db)
+        self.connection = pymysql.connect(user=self.user, db=self.db)
         self.cursor = self.connection.cursor()
 
     def __del__(self):
-        if self.connection.socket is not None:
+        if(
+            hasattr(self, 'connection') and
+            self.connection.socket is not None
+        ):
             self.connection.close()
 
     def __enter__(self):
@@ -66,11 +68,18 @@ class Database:
 
     def query(self, query: str):
         """Query database."""
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
+        cnt = self.cursor.execute(query)
+        if cnt:
+            return None
+        else:
+            return self.cursor.fetchall()
 
 
 if __name__ == '__main__':
     database = Database()
-    for row in database.query('SELECT * FROM events'):
+    events = """
+    SELECT *
+      FROM events
+    """
+    for row in database.query(events):
         print(row)
