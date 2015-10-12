@@ -16,10 +16,8 @@ import datetime
 import os
 import time
 from fractions import Fraction
-
 import picamera
 import picamera.array
-
 import settings
 from utils.daemons import DaemonBase, init
 from utils.database import Database
@@ -144,7 +142,7 @@ class MotionCapture:
             data1 = self.__take_motion()
             while True:
                 data2 = self.__take_motion()
-                if data1 and data2:
+                if (data1 is not None) and (data2 is not None):
                     diff_count = 0
                     for w in range(0, self.testWidth):
                         for h in range(0, self.testHeight):
