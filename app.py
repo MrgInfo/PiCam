@@ -1,7 +1,6 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 """This script runs the application using a development server.
 """
 
@@ -34,12 +33,14 @@ if __name__ == '__main__':
     except ValueError:
         PORT = 5555
 
+
     @bottle.route('/static/<file_path:path>')
     def server_static(file_path):
         """Handler for static files, used with the development server.
         When running under a production server such as IIS or Apache,
         the server should be configured to serve the static files."""
         return bottle.static_file(file_path, root=STATIC_ROOT)
+
 
     # Starts a local test server.
     bottle.run(server='wsgiref', host=HOST, port=PORT)
