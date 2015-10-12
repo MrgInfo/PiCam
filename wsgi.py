@@ -7,9 +7,12 @@ the Python WSGI interface. The module would be suitable for use in hosting high 
 well as your average self managed personal sites running on web hosting services.
 
 apache2.conf:
-        WSGIPythonPath /usr/local/PiCam
-        WSGIScriptAlias / /usr/local/PiCam/wsgi.py
-        Alias /static/ /usr/local/PiCam/static/
+    WSGIPythonPath /usr/local/PiCam
+
+    <VirtualHost *:80>
+        WSGIScriptAlias /        /usr/local/PiCam/wsgi.py
+        Alias           /static/ /usr/local/PiCam/static/
+    </VirtualHost>
 """
 
 import bottle

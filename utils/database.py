@@ -69,7 +69,7 @@ class Database:
     def query(self, query: str):
         """Query database."""
         cnt = self.cursor.execute(query)
-        if cnt:
+        if not cnt:
             return None
         else:
             return self.cursor.fetchall()
