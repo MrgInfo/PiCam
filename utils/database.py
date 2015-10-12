@@ -2,6 +2,22 @@
 # -*- coding: utf-8 -*-
 
 """Manage database.
+
+CREATE DATABASE motion DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
+
+USE motion;
+CREATE TABLE IF NOT EXISTS events (
+  file varchar(200) COLLATE utf8_bin NOT NULL,
+  size int(11) DEFAULT NULL,
+  diff_cnt int(11) DEFAULT NULL,
+  time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  url varchar(500) COLLATE utf8_bin DEFAULT NULL,
+  uploaded timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (file)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE USER 'pi'@'localhost';
+RANT ALL ON motion.* TO 'pi'@'localhost';
 """
 
 import pymysql
@@ -21,16 +37,17 @@ __all__ = ['Database']
 class Database:
     """Wrapper class for database."""
 
-    host = 'localhost'
-    user = 'pi'
     db = 'motion'
+    user = 'pi'
+    host = 'localhost'
 
     def __init__(self):
         self.connection = pymysql.connect(host=self.host, user=self.user, db=self.db)
         self.cursor = self.connection.cursor()
 
     def __del__(self):
-        self.connection.close()
+        if self.connection.socket is not None:
+            self.connection.close()
 
     def __enter__(self):
         return self
