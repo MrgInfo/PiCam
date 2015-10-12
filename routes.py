@@ -4,7 +4,7 @@
 """
 
 from bottle import route, view
-from urllib3 import PoolManager, Timeout
+from urllib3 import PoolManager, Timeout, exceptions
 
 from utils.database import Database
 
@@ -26,11 +26,15 @@ STREAMS = [
 def _check_url(url: str) -> bool:
     timeout = Timeout(connect=1.0, read=1.0)
     with PoolManager(timeout=timeout) as http:
-        response = http.request('GET', url)
+        response = None
         try:
+            response = http.request('GET', url)
             return response.status == 200
+        except exceptions.MaxRetryError:
+            return False
         finally:
-            response.release_conn()
+            if response is not None:
+                response.release_conn()
 
 
 def _streams():
