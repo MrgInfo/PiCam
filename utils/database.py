@@ -47,7 +47,9 @@ class Database:
     def __del__(self):
         if(
             hasattr(self, 'connection') and
-            self.connection.socket is not None
+            (self.connection is not None) and
+            hasattr(self.connection, 'socket') and
+            (self.connection.socket is not None)
         ):
             self.connection.close()
 
@@ -69,7 +71,7 @@ class Database:
     def query(self, query: str):
         """Query database."""
         cnt = self.cursor.execute(query)
-        if not cnt:
+        if cnt == 0:
             return None
         else:
             return self.cursor.fetchall()
