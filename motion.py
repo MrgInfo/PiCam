@@ -15,6 +15,7 @@
 import datetime
 import os
 import time
+import platform
 from fractions import Fraction
 
 import picamera
@@ -184,15 +185,17 @@ class MotionDaemon(DaemonBase):
                     insert = """
                     INSERT INTO events(
                         file,
+                        location,
                         size,
                         diff_cnt,
                         time)
                     VALUES (
                         '{}',
+                        '{}',
                         {},
                         {},
                         current_timestamp)
-                    """.format(file, size, diff)
+                    """.format(file, platform.node(), size, diff)
                     db.dml(insert)
             finally:
                 print("No longer detecting motion.")

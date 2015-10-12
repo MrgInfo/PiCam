@@ -4,6 +4,7 @@
 """
 
 from bottle import route, view
+from urllib3 import PoolManager, Timeout
 
 from utils.database import Database
 
@@ -16,28 +17,49 @@ __version__ = "1.0.1"
 __maintainer__ = "Groma István"
 __email__ = "wavezone@mrginfo.com"
 
-
 # noinspection SpellCheckingInspection
+STREAMS = [
+    {'name': "Szuterén", 'url': 'http://wavepi.gotdns.org:8080/cam.mjpg'},
+    {'name': "Teázó", 'url': 'http://nikipi.gotdns.org:8080/cam.mjpg'}]
+
+
+def _check_url(url: str) -> bool:
+    timeout = Timeout(connect=1.0, read=1.0)
+    with PoolManager(timeout=timeout) as http:
+        response = http.request('GET', url)
+        try:
+            return response.status == 200
+        finally:
+            response.release_conn()
+
+
+def _streams():
+    return [stream for stream in STREAMS if _check_url(stream['url'])]
+
+
 @route('/')
 @route('/home')
 @view('index')
 def home():
+    """Events."""
     with Database() as database:
         events = [
-            {'time': time, 'camera': 'Szuterén', 'size': size, 'url': url}
-            for (file, time, size, url)
-            in database.query("SELECT file, time, size, url FROM events")
+            {'time': time, 'camera': location, 'size': size, 'url': url}
+            for (file, location, time, size, url)
+            in database.query("""
+                SELECT file,
+                       location,
+                       time,
+                       size,
+                       url
+                  FROM events
+            """)
         ]
         return {'events': events}
 
 
-# noinspection SpellCheckingInspection
 @route('/view')
 @view('view')
 def view():
-    return {
-        'streams': [
-            {'name': "Szuterén", 'url': 'http://wavepi.gotdns.org:8080/cam.mjpg'},
-            {'name': "Teázó", 'url': 'http://nikipi.gotdns.org:8080/cam.mjpg'}
-        ]
-    }
+    """Video stream."""
+    return {'streams': _streams()}
