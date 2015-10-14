@@ -4,7 +4,8 @@
 """Basic settings.
 """
 
-from os.path import exists
+from configparser import ConfigParser
+from os import path
 
 __author__ = "wavezone"
 __copyright__ = "Copyright 2015, MRG-Infó Bt."
@@ -15,20 +16,56 @@ __version__ = "1.0.1"
 __maintainer__ = "Groma István"
 __email__ = "wavezone@mrginfo.com"
 
-__all__ = ['working_dir']
-
-DEFAULT_DIR = '/var/local/PiCam'
+__all__ = ['Settings', 'config']
 
 
-def working_dir() -> str:
-    """
-    The working directory.
-    """
-    new_dir = DEFAULT_DIR
-    while not exists(new_dir):
-        new_dir = input("Please provide a working directory: ").strip()
-    return new_dir
+class Settings:
+    """PiCam config settings."""
 
+    config_file = path.join(path.dirname(__file__), '..', 'PiCam.cfg')
+    config = ConfigParser()
+
+    @property
+    def host(self):
+        """MySQL database network name."""
+        return self.config.get('Database', 'Host', fallback='localhost')
+
+    @property
+    def user(self):
+        """MySQL database user."""
+        return self.config.get('Database', 'User', fallback='picam')
+
+    @property
+    def password(self):
+        """MySQL database password."""
+        return self.config.get('Database', 'Password', fallback='')
+
+    @property
+    def working_dir(self):
+        """The working directory."""
+        return self.config.get('Main', 'WorkingDir', fallback='/var/local/PiCam')
+
+    @property
+    def access_token(self):
+        """Dropbox authorization code."""
+        return self.config.get('Dropbox', 'Access', fallback=None)
+
+    def load(self):
+        """Load settings from file."""
+        if path.exists(self.config_file):
+            self.config.read(self.config_file)
+
+    def save(self):
+        """Save settings to file."""
+        self.config.write(self.config_file)
+
+    def __str__(self):
+        """Show sections."""
+        return str(self.config.sections())
+
+
+config = Settings()
+config.load()
 
 if __name__ == '__main__':
-    print(working_dir())
+    print(config)

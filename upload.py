@@ -12,12 +12,14 @@
 """Dropbox upload daemon.
 """
 
-import urllib3
-import os.path
 from operator import itemgetter
 from os import listdir
 from time import strptime, sleep
+import urllib3
+import os.path
+
 import dropbox
+
 from utils import settings
 from utils.daemons import DaemonBase, init
 from utils.database import Database
@@ -36,15 +38,12 @@ class UploadDaemon(DaemonBase):
     """Dropbox upload daemon."""
 
     max_size = 1024 ** 3 // 2
+    access_token = settings.config.access_token
 
     def __init__(self, directory: str):
         super().__init__()
         self.directory = directory
-        self.secret_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'secret.txt')
-        if os.path.exists(self.secret_file):
-            with open(self.secret_file, 'r+') as file:
-                self.access_token = file.read()
-        else:
+        if self.access_token is None:
             # noinspection SpellCheckingInspection
             flow = dropbox.client.DropboxOAuth2FlowNoRedirect('m9cijknmu1po39d', 'bi8dlhif9215qg3')
             authorize_url = flow.start()
@@ -53,8 +52,8 @@ class UploadDaemon(DaemonBase):
             print('3. Copy the authorization code.')
             code = input("Enter the authorization code here: ").strip()
             self.access_token, user_id = flow.finish(code)
-            with open(self.secret_file, 'w+') as file:
-                file.write(self.access_token)
+            settings.config.access_token = self.access_token
+            settings.config.save()
 
     def run(self):
         """Upload logic."""
@@ -106,5 +105,5 @@ class UploadDaemon(DaemonBase):
 
 
 if __name__ == '__main__':
-    my_daemon = UploadDaemon(settings.working_dir())
+    my_daemon = UploadDaemon(settings.config.working_dir)
     init(my_daemon)

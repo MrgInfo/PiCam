@@ -22,6 +22,7 @@ GRANT ALL ON motion.* TO 'picam'@'localhost';
 """
 
 import pymysql
+from utils import settings
 
 __author__ = "wavezone"
 __copyright__ = "Copyright 2015, MRG-Infó Bt."
@@ -38,11 +39,12 @@ __all__ = ['Database']
 class Database:
     """Wrapper class for database."""
 
-    db = 'motion'
-    user = 'picam'
-
     def __init__(self):
-        self.connection = pymysql.connect(user=self.user, db=self.db)
+        self.connection = pymysql.connect(
+            host=settings.config.host,
+            user=settings.config.user,
+            password=settings.config.password,
+            db='motion')
         self.cursor = self.connection.cursor()
 
     def __del__(self):

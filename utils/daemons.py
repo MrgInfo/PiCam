@@ -4,12 +4,11 @@
 """In one of my project I need to program in Python 3 daemon.
 """
 
-import traceback
+import sys
 import time
+import traceback
 
 from optparse import OptionParser
-
-import sys
 from daemon import runner
 
 __author__ = "wavezone"

@@ -202,5 +202,5 @@ class MotionDaemon(DaemonBase):
 
 
 if __name__ == '__main__':
-    my_daemon = MotionDaemon(settings.working_dir())
+    my_daemon = MotionDaemon(settings.config.working_dir)
     init(my_daemon)
