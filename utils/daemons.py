@@ -72,7 +72,8 @@ def _background(a_daemon: DaemonBase):
 
 
 def init(a_daemon: DaemonBase):
-    """Initialize the Python program for running the particular daemon."""
+    """ Initialize the Python program for running the particular daemon.
+        """
     # noinspection PyBroadException
     try:
         parser = OptionParser()

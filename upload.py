@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 ### BEGIN INIT INFO
 # Provides:          upload
 # Required-Start:    $network $remote_fs
@@ -15,10 +16,10 @@
 from operator import itemgetter
 from os import listdir
 from time import strptime, sleep
-import urllib3
 import os.path
 
 import dropbox
+import urllib3
 
 from utils import settings
 from utils.daemons import DaemonBase, init
@@ -35,15 +36,19 @@ __email__ = "wavezone@mrginfo.com"
 
 
 class UploadDaemon(DaemonBase):
-    """Dropbox upload daemon."""
+    """ Dropbox upload daemon.
+        """
 
     max_size = 1024 ** 3 // 2
     access_token = settings.config.access_token
 
     def __init__(self, directory: str):
+        """ Constructor.
+            """
         super().__init__()
         self.directory = directory
-        if self.access_token is None:
+        if self.access_token is None or\
+           self.access_token == '':
             # noinspection SpellCheckingInspection
             flow = dropbox.client.DropboxOAuth2FlowNoRedirect('m9cijknmu1po39d', 'bi8dlhif9215qg3')
             authorize_url = flow.start()
@@ -56,7 +61,8 @@ class UploadDaemon(DaemonBase):
             settings.config.save()
 
     def run(self):
-        """Upload logic."""
+        """ Upload logic.
+            """
         print("Uploading from {} to Dropbox.".format(self.directory))
         try:
             # noinspection PyDeprecation
@@ -68,8 +74,15 @@ class UploadDaemon(DaemonBase):
                 except urllib3.exceptions.MaxRetryError:
                     sleep(10)
                     continue
-                files = [{'file': m['path'], 'modified': strptime(m['modified'], '%a, %d %b %Y %H:%M:%S %z'),
-                          'size': m['bytes']} for m in metadata['contents'] if not m['is_dir']]
+                files = [
+                    {
+                        'file': m['path'],
+                        'modified': strptime(m['modified'], '%a, %d %b %Y %H:%M:%S %z'),
+                        'size': m['bytes']
+                    }
+                    for m in metadata['contents']
+                    if not m['is_dir']
+                ]
                 # Upload new files from directory:
                 for filename in listdir(self.directory):
                     local_name = '/' + filename
@@ -98,10 +111,10 @@ class UploadDaemon(DaemonBase):
                     if total_size < self.max_size:
                         break
                     client.file_delete(file['file'])
-                    print("%s was deleted from Dropbox." % file['file'])
+                    print("{} was deleted from Dropbox.".format(file['file']))
                     total_size -= file['size']
         finally:
-            print("No longer uploading from %s to Dropbox." % self.directory)
+            print("No longer uploading from {} to Dropbox.".format(self.directory))
 
 
 if __name__ == '__main__':
