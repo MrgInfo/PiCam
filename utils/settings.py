@@ -58,7 +58,7 @@ class Settings:
 
     @access_token.setter
     def access_token(self, val):
-        self.access_token = val
+        self.config.set('Dropbox', 'Access', val)
         self.save()
 
     def load(self):
