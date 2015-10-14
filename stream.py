@@ -107,10 +107,13 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
         self.end_headers()
         self.wfile.write(html.encode('utf-8'))
 
+    def _ok(self):
+        self.send_response(200)
+
     def do_GET(self):
         try:
             if self.path is None:
-                return
+                self._ok()
             path = re.sub('[^.a-zA-Z0-9]', "", str(self.path))
             if path.endswith('.jpg') or path.endswith('.jpeg'):
                 self._jpeg()

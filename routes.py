@@ -19,7 +19,7 @@ __email__ = "wavezone@mrginfo.com"
 
 # noinspection SpellCheckingInspection
 STREAMS = [
-    {'name': "Szuterén", 'url': 'http://wavepi.gotdns.org:8080/cam.mjpg'},
+    {'name': "Szuterén", 'url': 'http://wavepi.gotdns.org:8080'},
     {'name': "Teázó", 'url': 'http://nikipi.gotdns.org:8080/cam.mjpg'}]
 
 
