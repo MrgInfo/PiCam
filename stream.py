@@ -18,8 +18,9 @@ import re
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-import picamera
+from picamera.exc import PiCameraError
 from websocket_server import ThreadingMixIn
+import picamera
 
 from utils.daemons import DaemonBase, init
 
@@ -109,6 +110,11 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
 
     def _ok(self):
         self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+
+    def _error(self):
+        self.send_error(404, "File Not Found: {}".format(self.path))
 
     def do_GET(self):
         try:
@@ -128,8 +134,8 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
                 self._html()
             else:
                 self._ok()
-        except IOError:
-            self.send_error(404, "File Not Found: {}".format(self.path))
+        except (IOError, PiCameraError):
+            self._error()
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
