@@ -70,7 +70,8 @@ class Settings:
     def save(self):
         """ Save settings to file.
             """
-        self.config.write(self.config_file)
+        with open(self.config_file, 'w') as fs:
+            self.config.write(fs)
 
     def __str__(self):
         """ Show sections.
