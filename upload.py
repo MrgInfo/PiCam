@@ -58,7 +58,6 @@ class UploadDaemon(DaemonBase):
             code = input("Enter the authorization code here: ").strip()
             self.access_token, user_id = flow.finish(code)
             settings.config.access_token = self.access_token
-            settings.config.save()
 
     def run(self):
         """ Upload logic.
