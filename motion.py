@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 ### BEGIN INIT INFO
 # Provides:          motion
 # Required-Start:    $network $remote_fs
@@ -9,8 +10,8 @@
 # Short-Description: Detecting motion
 ### END INIT INFO
 
-"""Daemon for detecting motion.
-"""
+""" Daemon for detecting motion.
+    """
 
 import datetime
 import os
@@ -38,7 +39,8 @@ SECONDS2MICRO = 1000000  # Constant for converting Shutter Speed in Seconds to M
 
 
 class MotionCapture:
-    """Detect motion on PiCam and capture short video."""
+    """ Detect motion on PiCam and capture short video.
+        """
 
     threshold = 10  # How Much pixel changes
     sensitivity = 100  # How many pixels change
@@ -168,14 +170,18 @@ class MotionCapture:
 
 
 class MotionDaemon(DaemonBase):
-    """Daemon for detecting motion."""
+    """ Daemon for detecting motion.
+        """
 
     def __init__(self, directory: str):
+        """ Constructor.
+            """
         super().__init__()
         self.directory = directory
 
     def run(self):
-        """Capture logic."""
+        """ Capture logic.
+            """
         print("Detecting curious motion.")
         with Database() as db:
             try:
