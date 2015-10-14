@@ -112,17 +112,22 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
 
     def do_GET(self):
         try:
-            if self.path is None:
-                self._ok()
-            path = re.sub('[^.a-zA-Z0-9]', "", str(self.path))
-            if path.endswith('.jpg') or path.endswith('.jpeg'):
-                self._jpeg()
-                return
+            if self.path is not None:
+                path = re.sub('[^.a-zA-Z0-9]', "", str(self.path))
+            else:
+                path = ''
             # noinspection SpellCheckingInspection
-            if path.endswith('.mjpg') or path.endswith('.mjpeg'):
+            if path.endswith('.jpg')\
+                    or path.endswith('.jpeg'):
+                self._jpeg()
+            elif path.endswith('.mjpg')\
+                    or path.endswith('.mjpeg'):
                 self._mjpg()
-                return
-            self._html()
+            elif path.endswith('.htm')\
+                    or path.endswith('.html'):
+                self._html()
+            else:
+                self._ok()
         except IOError:
             self.send_error(404, "File Not Found: {}".format(self.path))
 
