@@ -5,7 +5,7 @@
 """
 
 from configparser import ConfigParser
-from os import path
+from os import path, mkdir
 
 __author__ = "wavezone"
 __copyright__ = "Copyright 2015, MRG-Infó Bt."
@@ -48,16 +48,21 @@ class Settings:
     def working_dir(self):
         """ The working directory.
             """
-        return self.config.get('Main', 'WorkingDir', fallback='/var/local/PiCam')
+        directory = self.config.get('Main', 'WorkingDir', fallback='/var/local/PiCam')
+        if not path.exists(directory):
+            mkdir(directory)
+        return directory
 
     @property
     def access_token(self):
-        """ Dropbox authorization code.
+        """ Dropbox OAuth 2 authorization token.
             """
         return self.config.get('Dropbox', 'Access', fallback=None)
 
     @access_token.setter
     def access_token(self, val):
+        """ Dropbox OAuth 2 authorization token.
+            """
         self.config.set('Dropbox', 'Access', val)
         self.save()
 

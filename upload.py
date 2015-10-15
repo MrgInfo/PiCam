@@ -14,9 +14,8 @@
 """
 
 from operator import itemgetter
-from os import listdir
+from os import listdir, path
 from time import strptime, sleep
-import os.path
 
 import dropbox
 import urllib3
@@ -52,10 +51,12 @@ class UploadDaemon(DaemonBase):
             # noinspection SpellCheckingInspection
             flow = dropbox.client.DropboxOAuth2FlowNoRedirect('m9cijknmu1po39d', 'bi8dlhif9215qg3')
             authorize_url = flow.start()
-            print('1. Go to: {}'.format(authorize_url))
-            print('2. Click "Allow" (you might have to log in first).')
-            print('3. Copy the authorization code.')
-            code = input("Enter the authorization code here: ").strip()
+            print("""OAuth 2 authorization process
+1. Go to: {}
+2. Click Allow (you might have to log in first).
+3. Copy the authorization code.
+""".format(authorize_url), end='')
+            code = input("4. Enter the authorization code here: ").strip()
             self.access_token, user_id = flow.finish(code)
             settings.config.access_token = self.access_token
 
@@ -91,7 +92,7 @@ class UploadDaemon(DaemonBase):
                             found = True
                             break
                     if not found:
-                        with open(os.path.join(self.directory, filename), 'rb') as file_stream:
+                        with open(path.join(self.directory, filename), 'rb') as file_stream:
                             client.put_file(local_name, file_stream)
                             share = client.share(local_name)
                         print("%s was uploaded to Dropbox." % filename)
