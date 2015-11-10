@@ -23,10 +23,9 @@ GRANT ALL ON motion.* TO 'picam'@'localhost';
 
 import pymysql
 
-# noinspection PyBroadException
 try:
     from utils import settings
-except:
+except (SystemError, ValueError):
     # noinspection PyUnresolvedReferences
     import settings
 
