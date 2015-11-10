@@ -8,6 +8,7 @@ import sys
 import time
 import traceback
 
+from lockfile import LockTimeout
 from optparse import OptionParser
 from daemon import runner
 
@@ -39,7 +40,7 @@ class DaemonBase:
     # noinspection PyMethodMayBeStatic
     def run(self):
         """ You should override this method when you subclass Daemon.
-        It will be called after the process has been daemonized by start() or restart().
+            It will be called after the process has been daemonized by start() or restart().
 
         Example:
 
@@ -64,6 +65,8 @@ def _interactive(a_daemon: DaemonBase):
     print("Starting server, use <Ctrl-C> to stop.")
     try:
         a_daemon.run()
+    except LockTimeout:
+        print("Error, couldn't acquire lock!")
     except KeyboardInterrupt:
         pass
 
