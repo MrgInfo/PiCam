@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""In one of my project I need to program in Python 3 daemon.
-"""
+""" In one of my project I need to program in Python 3 daemon.
+    """
 
 import sys
 import time
@@ -24,7 +24,8 @@ __all__ = ['DaemonBase', 'init']
 
 
 class DaemonBase:
-    """Base class for creating well behaving daemons."""
+    """ Base class for creating well behaving daemons.
+        """
 
     def __init__(self):
         self.stdin_path = '/dev/null'
@@ -37,7 +38,7 @@ class DaemonBase:
 
     # noinspection PyMethodMayBeStatic
     def run(self):
-        """You should override this method when you subclass Daemon.
+        """ You should override this method when you subclass Daemon.
         It will be called after the process has been daemonized by start() or restart().
 
         Example:
@@ -50,7 +51,8 @@ class DaemonBase:
 
 
 class TwinkleDaemon(DaemonBase):
-    """Example."""
+    """ Example.
+        """
 
     def run(self):
         while True:

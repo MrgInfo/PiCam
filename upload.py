@@ -3,15 +3,15 @@
 
 ### BEGIN INIT INFO
 # Provides:          upload
-# Required-Start:    $network $remote_fs
-# Required-Stop:     $network $remote_fs
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Dropbox upload daemon
 ### END INIT INFO
 
-"""Dropbox upload daemon.
-"""
+""" Dropbox upload daemon.
+    """
 
 from operator import itemgetter
 from os import listdir, path
