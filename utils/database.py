@@ -27,7 +27,8 @@ import pymysql
 try:
     from utils import settings
 except:
-    from . import settings
+    # noinspection PyUnresolvedReferences
+    import settings
 
 __author__ = "wavezone"
 __copyright__ = "Copyright 2015, MRG-Infó Bt."
