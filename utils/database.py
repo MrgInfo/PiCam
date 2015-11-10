@@ -22,7 +22,7 @@ GRANT ALL ON motion.* TO 'picam'@'localhost';
 """
 
 import pymysql
-from utils import settings
+from . import settings
 
 __author__ = "wavezone"
 __copyright__ = "Copyright 2015, MRG-Infó Bt."
