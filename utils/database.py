@@ -25,7 +25,7 @@ import pymysql
 
 try:
     from utils import settings
-except (SystemError, ValueError):
+except ImportError:
     # noinspection PyUnresolvedReferences
     import settings
 
@@ -69,15 +69,21 @@ class Database:
         self.connection.close()
 
     def dml(self, query: str):
-        """Run data manipulation."""
+        """ Run data manipulation.
+
+        :param query: SQL
+        """
         try:
             self.cursor.execute(query)
             self.connection.commit()
         except pymysql.Error:
             self.connection.rollback()
 
-    def query(self, query: str):
-        """Query database."""
+    def query(self, query: str) -> object:
+        """ Query database.
+
+        :param query: SQL
+        """
         cnt = self.cursor.execute(query)
         if cnt == 0:
             return None

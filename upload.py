@@ -16,8 +16,9 @@
 from operator import itemgetter
 from os import listdir, path
 from time import strptime, sleep
+from urllib3.exceptions import MaxRetryError
 
-import dropbox
+from dropbox.client import DropboxClient, DropboxOAuth2FlowNoRedirect
 import urllib3
 
 from utils import settings
@@ -46,19 +47,77 @@ class UploadDaemon(DaemonBase):
             """
         super().__init__()
         self.directory = directory
-        if self.access_token is None or\
-           self.access_token == '':
+        if self.access_token is None or self.access_token == '':
             # noinspection SpellCheckingInspection
-            flow = dropbox.client.DropboxOAuth2FlowNoRedirect('m9cijknmu1po39d', 'bi8dlhif9215qg3')
+            flow = DropboxOAuth2FlowNoRedirect('m9cijknmu1po39d', 'bi8dlhif9215qg3')
             authorize_url = flow.start()
-            print("""OAuth 2 authorization process
-1. Go to: {}
-2. Click Allow (you might have to log in first).
-3. Copy the authorization code.
-""".format(authorize_url), end='')
+            print("OAuth 2 authorization process")
+            print("1. Go to: {}".format(authorize_url))
+            print("2. Click Allow (you might have to log in first).")
+            print("3. Copy the authorization code.")
             code = input("4. Enter the authorization code here: ").strip()
             self.access_token, user_id = flow.finish(code)
             settings.config.access_token = self.access_token
+
+    @staticmethod
+    def _get(client: DropboxClient) -> list:
+        """ Get files from Dropbox.
+            """
+        try:
+            metadata = client.metadata('/')
+        except MaxRetryError:
+            return None
+        return [
+            {
+                'file': m['path'],
+                'modified': strptime(m['modified'], '%a, %d %b %Y %H:%M:%S %z'),
+                'size': m['bytes']
+            }
+            for m in metadata['contents']
+            if not m['is_dir']
+        ]
+
+    def _upload(self, client: DropboxClient, files: list):
+        """ Upload new files from directory.
+            """
+        for filename in listdir(self.directory):
+            local_name = '/' + filename
+            found = False
+            for f in files:
+                if f['file'] == local_name:
+                    found = True
+                    break
+            if not found:
+                with open(path.join(self.directory, filename), 'rb') as file_stream:
+                    try:
+                        client.put_file(local_name, file_stream)
+                        share = client.share(local_name)
+                    except MaxRetryError:
+                        continue
+                print("%s was uploaded to Dropbox." % filename)
+                with Database() as db:
+                    update = """
+                    UPDATE events
+                       SET url = '{}',
+                           uploaded = current_timestamp
+                     WHERE file = '{}'
+                    """.format(share['url'], filename)
+                    db.dml(update)
+
+    def _rotate(self, client: DropboxClient, files: list):
+        """  Rotate Dropbox in order to save storage.
+            """
+        total_size = sum(item['size'] for item in files)
+        files_history = sorted(files, key=itemgetter('modified'))
+        for file in files_history:
+            if total_size < self.max_size:
+                break
+            try:
+                client.file_delete(file['file'])
+                print("{} was deleted from Dropbox.".format(file['file']))
+                total_size -= file['size']
+            except urllib3.exceptions.MaxRetryError:
+                pass
 
     def run(self):
         """ Upload logic.
@@ -66,53 +125,14 @@ class UploadDaemon(DaemonBase):
         print("Uploading from {} to Dropbox.".format(self.directory))
         try:
             # noinspection PyDeprecation
-            client = dropbox.client.DropboxClient(self.access_token)
+            client = DropboxClient(self.access_token)
             while True:
-                # Get files from Dropbox:
-                try:
-                    metadata = client.metadata('/')
-                except urllib3.exceptions.MaxRetryError:
-                    sleep(10)
-                    continue
-                files = [
-                    {
-                        'file': m['path'],
-                        'modified': strptime(m['modified'], '%a, %d %b %Y %H:%M:%S %z'),
-                        'size': m['bytes']
-                    }
-                    for m in metadata['contents']
-                    if not m['is_dir']
-                ]
-                # Upload new files from directory:
-                for filename in listdir(self.directory):
-                    local_name = '/' + filename
-                    found = False
-                    for f in files:
-                        if f['file'] == local_name:
-                            found = True
-                            break
-                    if not found:
-                        with open(path.join(self.directory, filename), 'rb') as file_stream:
-                            client.put_file(local_name, file_stream)
-                            share = client.share(local_name)
-                        print("%s was uploaded to Dropbox." % filename)
-                        with Database() as db:
-                            update = """
-                            UPDATE events
-                               SET url = '{}',
-                                   uploaded = current_timestamp
-                             WHERE file = '{}'
-                            """.format(share['url'], filename)
-                            db.dml(update)
-                # Rotate Dropbox in order to save storage:
-                total_size = sum(item['size'] for item in files)
-                files_history = sorted(files, key=itemgetter('modified'))
-                for file in files_history:
-                    if total_size < self.max_size:
-                        break
-                    client.file_delete(file['file'])
-                    print("{} was deleted from Dropbox.".format(file['file']))
-                    total_size -= file['size']
+                files = self._get(client)
+                if files is None or files is []:
+                    sleep(5 * 60)
+                else:
+                    self._upload(client, files)
+                    self._rotate(client, files)
         finally:
             print("No longer uploading from {} to Dropbox.".format(self.directory))
 
