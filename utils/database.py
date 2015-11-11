@@ -22,8 +22,8 @@ GRANT ALL ON motion.* TO 'picam'@'localhost';
 
 """
 
+from pymysql.err import OperationalError, MySQLError
 import pymysql
-import pymysql.err
 
 try:
     from utils import settings
@@ -48,50 +48,64 @@ class Database:
         """
 
     def __init__(self):
-        self.connection = pymysql.connect(
-            host=settings.config.host,
-            user=settings.config.user,
-            password=settings.config.password,
-            db='motion')
-        self.cursor = self.connection.cursor()
+        try:
+            self.connection = pymysql.connect(
+                host=settings.config.host,
+                user=settings.config.user,
+                password=settings.config.password,
+                db='motion')
+            self.cursor = self.connection.cursor()
+        except MySQLError:
+            self.connection = None
+            self.cursor = None
 
     def __del__(self):
-        if hasattr(self, 'connection')\
-                and (self.connection is not None)\
-                and hasattr(self.connection, 'socket')\
-                and (self.connection.socket is not None):
-            self.connection.close()
+        if hasattr(self, 'connection') and (self.connection is not None):
+            try:
+                self.connection.close()
+            except MySQLError:
+                pass
 
     def __enter__(self):
         return self
 
     # noinspection PyUnusedLocal
     def __exit__(self, exception_type, exception_value, traceback):
-        self.connection.close()
+        if hasattr(self, 'connection') and (self.connection is not None):
+            try:
+                self.connection.close()
+            except MySQLError:
+                pass
 
     def dml(self, query: str):
         """ Run data manipulation.
 
             :param query: SQL
             """
-        try:
-            self.cursor.execute(query)
-            self.connection.commit()
-        except pymysql.Error:
-            self.connection.rollback()
-        except pymysql.err.OperationalError:
-            pass
+        if hasattr(self, 'cursor') and (self.cursor is not None)\
+                and hasattr(self, 'connection') and (self.connection is not None):
+            try:
+                self.cursor.execute(query)
+                self.connection.commit()
+            except OperationalError:
+                pass
+            except MySQLError:
+                self.connection.rollback()
 
     def query(self, query: str):
         """ Query database.
 
             :param query: SQL
             """
-        cnt = self.cursor.execute(query)
-        if cnt == 0:
-            return None
-        else:
-            return self.cursor.fetchall()
+        if hasattr(self, 'cursor') and (self.cursor is not None):
+            try:
+                cnt = self.cursor.execute(query)
+                if cnt == 0:
+                    return None
+                else:
+                    return self.cursor.fetchall()
+            except MySQLError:
+                pass
 
 
 if __name__ == '__main__':
