@@ -22,6 +22,7 @@ GRANT ALL ON motion.* TO 'picam'@'localhost';
 """
 
 import pymysql
+import pymysql.err
 
 try:
     from utils import settings
@@ -53,12 +54,10 @@ class Database:
         self.cursor = self.connection.cursor()
 
     def __del__(self):
-        if(
-            hasattr(self, 'connection') and
-            (self.connection is not None) and
-            hasattr(self.connection, 'socket') and
-            (self.connection.socket is not None)
-        ):
+        if hasattr(self, 'connection')\
+                and (self.connection is not None)\
+                and hasattr(self.connection, 'socket')\
+                and (self.connection.socket is not None):
             self.connection.close()
 
     def __enter__(self):
@@ -78,8 +77,10 @@ class Database:
             self.connection.commit()
         except pymysql.Error:
             self.connection.rollback()
+        except pymysql.err.OperationalError:
+            pass
 
-    def query(self, query: str) -> object:
+    def query(self, query: str):
         """ Query database.
 
         :param query: SQL
