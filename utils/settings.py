@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Basic settings.
-"""
+""" Basic settings.
+    """
 
 from configparser import ConfigParser
 from os import path, mkdir
@@ -27,25 +27,25 @@ class Settings:
     config = ConfigParser()
 
     @property
-    def host(self):
+    def host(self) -> str:
         """ MySQL database network name.
             """
         return self.config.get('Database', 'Host', fallback='localhost')
 
     @property
-    def user(self):
+    def user(self) -> str:
         """ MySQL database user.
             """
         return self.config.get('Database', 'User', fallback='picam')
 
     @property
-    def password(self):
+    def password(self) -> str:
         """ MySQL database password.
             """
         return self.config.get('Database', 'Password', fallback='')
 
     @property
-    def working_dir(self):
+    def working_dir(self) -> str:
         """ The working directory.
             """
         directory = self.config.get('Main', 'WorkingDir', fallback='/var/local/PiCam')
@@ -54,13 +54,13 @@ class Settings:
         return directory
 
     @property
-    def access_token(self):
+    def access_token(self) -> str:
         """ Dropbox OAuth 2 authorization token.
             """
         return self.config.get('Dropbox', 'Access', fallback=None)
 
     @access_token.setter
-    def access_token(self, val):
+    def access_token(self, val: str):
         """ Dropbox OAuth 2 authorization token.
             """
         self.config.set('Dropbox', 'Access', val)

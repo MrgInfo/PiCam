@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Manage database.
+""" Manage database.
 
 CREATE DATABASE motion DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
 
@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS events (
 
 CREATE USER 'picam'@'localhost';
 GRANT ALL ON motion.* TO 'picam'@'localhost';
+
 """
 
 import pymysql
@@ -43,7 +44,8 @@ __all__ = ['Database']
 
 
 class Database:
-    """Wrapper class for database."""
+    """ Wrapper class for database.
+        """
 
     def __init__(self):
         self.connection = pymysql.connect(
@@ -70,8 +72,8 @@ class Database:
     def dml(self, query: str):
         """ Run data manipulation.
 
-        :param query: SQL
-        """
+            :param query: SQL
+            """
         try:
             self.cursor.execute(query)
             self.connection.commit()
@@ -83,8 +85,8 @@ class Database:
     def query(self, query: str):
         """ Query database.
 
-        :param query: SQL
-        """
+            :param query: SQL
+            """
         cnt = self.cursor.execute(query)
         if cnt == 0:
             return None
