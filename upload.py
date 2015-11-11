@@ -17,9 +17,10 @@ from operator import itemgetter
 from os import listdir, path
 from time import strptime, sleep
 from urllib3.exceptions import MaxRetryError
+import urllib3
 
 from dropbox.client import DropboxClient, DropboxOAuth2FlowNoRedirect
-import urllib3
+from dropbox.rest import ErrorResponse
 
 from utils import settings
 from utils.daemons import DaemonBase, init
@@ -65,7 +66,7 @@ class UploadDaemon(DaemonBase):
             """
         try:
             metadata = client.metadata('/')
-        except MaxRetryError:
+        except (MaxRetryError, ErrorResponse):
             return None
         return [
             {
@@ -88,7 +89,8 @@ class UploadDaemon(DaemonBase):
                     found = True
                     break
             if not found:
-                with open(path.join(self.directory, filename), 'rb') as file_stream:
+                full_name = path.join(self.directory, filename)
+                with open(full_name, 'rb') as file_stream:
                     try:
                         client.put_file(local_name, file_stream)
                         share = client.share(local_name)
@@ -101,7 +103,7 @@ class UploadDaemon(DaemonBase):
                        SET url = '{}',
                            uploaded = current_timestamp
                      WHERE file = '{}'
-                    """.format(share['url'], filename)
+                    """.format(share['url'], full_name)
                     db.dml(update)
 
     def _rotate(self, client: DropboxClient, files: list):
