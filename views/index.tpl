@@ -16,7 +16,11 @@
                 <td>{{item['time']}}</td>
                 <td>{{item['camera']}}</td>
                 <td>{{item['size']}}</td>
+            % if item['url'] is not None:
                 <td><a href="{{item['url']}}">{{item['url']}}</a></td>
+            % else:
+                <td>&nbsp;</td>
+            % end
             </tr>
         % end
         </tbody>

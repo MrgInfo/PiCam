@@ -13,8 +13,10 @@
 """ Dropbox upload daemon.
     """
 
+
 from operator import itemgetter
-from os import listdir, path
+from os import listdir, path, mknod
+from fnmatch import fnmatch
 from time import strptime, sleep
 from urllib3.exceptions import MaxRetryError
 import urllib3
@@ -82,14 +84,17 @@ class UploadDaemon(DaemonBase):
         """ Upload new files from directory.
             """
         for filename in listdir(self.directory):
+            if fnmatch(filename, '*.upl'):
+                continue
             local_name = '/' + filename
+            full_name = path.join(self.directory, filename)
+            upl_name = "{}.upl".format(full_name)
             found = False
             for f in files:
                 if f['file'] == local_name:
                     found = True
                     break
-            if not found:
-                full_name = path.join(self.directory, filename)
+            if not found and not path.isfile(upl_name):
                 with open(full_name, 'rb') as file_stream:
                     try:
                         client.put_file(local_name, file_stream)
@@ -105,6 +110,7 @@ class UploadDaemon(DaemonBase):
                      WHERE file = '{}'
                     """.format(share['url'], full_name)
                     db.dml(update)
+                mknod(upl_name)
 
     def _rotate(self, client: DropboxClient, files: list):
         """  Rotate Dropbox in order to save storage.
