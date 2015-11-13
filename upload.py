@@ -99,7 +99,7 @@ class UploadDaemon(DaemonBase):
                     try:
                         client.put_file(local_name, file_stream)
                         share = client.share(local_name)
-                    except MaxRetryError:
+                    except (MaxRetryError, ErrorResponse):
                         continue
                 print("%s was uploaded to Dropbox." % filename)
                 with Database() as db:
@@ -124,7 +124,7 @@ class UploadDaemon(DaemonBase):
                 client.file_delete(file['file'])
                 print("{} was deleted from Dropbox.".format(file['file']))
                 total_size -= file['size']
-            except urllib3.exceptions.MaxRetryError:
+            except (MaxRetryError, ErrorResponse):
                 pass
 
     def run(self):

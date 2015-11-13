@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""Routes and views for the bottle application.
-"""
+""" Routes and views for the bottle application.
+    """
 
 from bottle import route, view
 from urllib3 import PoolManager, Timeout, exceptions
@@ -45,25 +45,31 @@ def _streams():
 @route('/home')
 @view('index')
 def home():
-    """Events."""
+    """ Events.
+        """
     with Database() as database:
-        events = [
-            {'time': time, 'camera': location, 'size': size, 'url': url}
-            for (file, location, time, size, url)
-            in database.query("""
-                SELECT file,
-                       location,
-                       time,
-                       size,
-                       url
-                  FROM events
-            """)
-        ]
-        return {'events': events}
+        data = database.query("""
+        SELECT file,
+               location,
+               time,
+               size,
+               url
+          FROM events
+        """)
+        if data is None:
+            return {'events': []}
+        else:
+            events = [
+                {'time': time, 'camera': location, 'size': size, 'url': url}
+                for (file, location, time, size, url)
+                in data
+            ]
+            return {'events': events}
 
 
 @route('/view')
 @view('view')
 def view():
-    """Video stream."""
+    """ Video stream.
+        """
     return {'streams': _streams()}
