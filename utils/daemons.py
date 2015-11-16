@@ -73,14 +73,15 @@ def _interactive(a_daemon: DaemonBase):
 
 def _background(a_daemon: DaemonBase):
     daemon_runner = runner.DaemonRunner(a_daemon)
+    #daemon_runner.daemon_context.files_preserve=[handler.stream]
     daemon_runner.do_action()
 
 
 def init(a_daemon: DaemonBase):
     """ Initialize the Python program for running the particular daemon.
 
-    :param a_daemon: Daemon logic.
-    """
+        :param a_daemon: Daemon logic.
+        """
     # noinspection PyBroadException
     try:
         parser = OptionParser()
@@ -90,7 +91,7 @@ def init(a_daemon: DaemonBase):
             _interactive(a_daemon)
         else:
             _background(a_daemon)
-    except Exception:
+    except:
         print(traceback.format_exc(), file=sys.stderr)
 
 

@@ -1,21 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-### BEGIN INIT INFO
-# Provides:          stream
-# Required-Start:    $local_fs $remote_fs $network $syslog $named
-# Required-Stop:     $local_fs $remote_fs $network $syslog $named
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: HTTP video stream
-### END INIT INFO
 
-"""A Simple mjpg stream http server for the Raspberry Pi Camera
-"""
+""" A Simple mjpg stream http server for the Raspberry Pi camera.
+    """
 
+import sys
 import datetime
 import io
 import re
 import time
+import traceback
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from picamera.exc import PiCameraError
@@ -35,7 +29,8 @@ __email__ = "wavezone@mrginfo.com"
 
 
 class CamHandler(BaseHTTPRequestHandler):
-    """Camera HTTP stream."""
+    """ Camera HTTP stream.
+        """
 
     def _jpeg(self):
         stream = io.BytesIO()
@@ -139,24 +134,34 @@ img {position:absolute; top:50%; left:50%; width:1024px; height:768px; margin-to
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
-    """Handle requests in a separate thread."""
+    """ Handle requests in a separate thread.
+        """
 
     daemon_threads = True
 
 
 class CameraDaemon(DaemonBase):
-    """Camera daemon."""
+    """ Camera daemon.
+        """
 
+    # noinspection PyBroadException
     def run(self):
-        """HTTP streaming logic."""
-        server = ThreadedHTTPServer(('', 8080), CamHandler)
-        with server.socket as socket:
-            try:
-                print("Serving on {}".format(socket.getsockname()))
-                server.serve_forever()
-            except KeyboardInterrupt:
-                print("No longer serving.")
-                server.shutdown()
+        """ HTTP streaming logic.
+            """
+        while True:
+            server = ThreadedHTTPServer(('', 8080), CamHandler)
+            with server.socket as socket:
+                try:
+                    print("Serving on {}".format(socket.getsockname()))
+                    server.serve_forever()
+                except KeyboardInterrupt:
+                    break
+                except:
+                    print(traceback.format_exc(), file=sys.stderr)
+                finally:
+                    print("No longer serving.")
+                    server.shutdown()
+            time.sleep(1)
 
 
 if __name__ == '__main__':
