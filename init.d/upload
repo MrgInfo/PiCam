@@ -1,5 +1,5 @@
-#!/bin/bash
-# Copyright (c) 2015  MRG-Infó Bt.
+#! /bin/bash
+# Copyright (c) 2015  MRG-Info Bt.
 # All rights reserved.
 #
 # Author: wavezone, 2015
@@ -13,7 +13,7 @@
 # Required-Start:    $local_fs $remote_fs $network $syslog $named
 # Required-Stop:     $local_fs $remote_fs $network $syslog $named
 # Default-Start:     2 3 4 5
-# Default-Stop:
+# Default-Stop:      0 1 6
 # Short-Description: Dropbox upload daemon
 # Description:       Runs up the Dropbox upload process
 ### END INIT INFO
