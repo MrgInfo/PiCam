@@ -99,7 +99,10 @@ class UploadDaemon(DaemonBase):
                      WHERE file = '{}'
                     """.format(share['url'], full_name)
                     db.dml(update)
-                mknod(upl_name)
+                try:
+                    mknod(upl_name)
+                except FileExistsError:
+                    pass
 
     def _rotate(self, client: DropboxClient, files: list):
         """  Rotate Dropbox in order to save storage.
