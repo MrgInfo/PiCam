@@ -31,7 +31,7 @@ class UploadDaemon(DaemonBase):
     """ Dropbox upload daemon.
         """
 
-    max_size = 1024 ** 3 // 2
+    max_size = 2 * (1024 ** 3)
     access_token = settings.config.access_token
 
     def __init__(self, directory: str):
