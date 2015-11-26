@@ -73,7 +73,6 @@ def _interactive(a_daemon: DaemonBase):
 
 def _background(a_daemon: DaemonBase):
     daemon_runner = runner.DaemonRunner(a_daemon)
-    #daemon_runner.daemon_context.files_preserve=[handler.stream]
     daemon_runner.do_action()
 
 

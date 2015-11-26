@@ -195,6 +195,8 @@ class MotionDaemon(DaemonBase):
                     """.format(file, platform.node(), size, diff)
                     with Database() as db:
                         db.dml(insert)
+        except (KeyboardInterrupt, SystemExit):
+            pass
         finally:
             print("No longer detecting motion.")
 

@@ -133,6 +133,8 @@ class UploadDaemon(DaemonBase):
                 else:
                     self._upload(client, files)
                     self._rotate(client, files)
+        except (KeyboardInterrupt, SystemExit):
+            pass
         finally:
             print("No longer uploading from {} to Dropbox.".format(self.directory))
 
