@@ -1,28 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-### BEGIN INIT INFO
-# Provides:          upload
-# Required-Start:    $local_fs $remote_fs $network $syslog $named
-# Required-Stop:     $local_fs $remote_fs $network $syslog $named
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Dropbox upload daemon
-### END INIT INFO
-
 """ Dropbox upload daemon.
     """
 
-
+from fnmatch import fnmatch
 from operator import itemgetter
 from os import listdir, path, mknod
-from fnmatch import fnmatch
 from time import strptime, sleep
-from urllib3.exceptions import MaxRetryError
-import urllib3
 
 from dropbox.client import DropboxClient, DropboxOAuth2FlowNoRedirect
 from dropbox.rest import ErrorResponse
+from urllib3.exceptions import MaxRetryError
 
 from utils import settings
 from utils.daemons import DaemonBase, init
@@ -110,7 +99,10 @@ class UploadDaemon(DaemonBase):
                      WHERE file = '{}'
                     """.format(share['url'], full_name)
                     db.dml(update)
-                mknod(upl_name)
+                try:
+                    mknod(upl_name)
+                except FileExistsError:
+                    pass
 
     def _rotate(self, client: DropboxClient, files: list):
         """  Rotate Dropbox in order to save storage.

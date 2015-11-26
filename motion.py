@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-### BEGIN INIT INFO
-# Provides:          motion
-# Required-Start:    $local_fs $remote_fs $network $syslog $named
-# Required-Stop:     $local_fs $remote_fs $network $syslog $named
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Detecting motion
-### END INIT INFO
-
 """ Daemon for detecting motion.
     """
 
@@ -183,8 +174,8 @@ class MotionDaemon(DaemonBase):
         """ Capture logic.
             """
         print("Detecting curious motion.")
-        with Database() as db:
-            try:
+        try:
+            while True:
                 motion = MotionCapture(self.directory)
                 for (file, diff) in motion:
                     size = os.path.getsize(file)
@@ -202,9 +193,10 @@ class MotionDaemon(DaemonBase):
                         {},
                         current_timestamp)
                     """.format(file, platform.node(), size, diff)
-                    db.dml(insert)
-            finally:
-                print("No longer detecting motion.")
+                    with Database() as db:
+                        db.dml(insert)
+        finally:
+            print("No longer detecting motion.")
 
 
 if __name__ == '__main__':
