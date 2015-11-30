@@ -66,11 +66,22 @@ class Settings:
         self.config.set('Dropbox', 'Access', val)
         self.save()
 
+    def defaults(self):
+        """ Default settings.
+            """
+        self.config.set('Main', 'WorkingDir', '/var/local/PiCam')
+        self.config.set('Database', 'Host', 'localhost')
+        self.config.set('Database', 'User', 'picam')
+        self.config.set('Database', 'Password', '')
+        self.config.set('Dropbox', 'Access', None)
+
     def load(self):
         """ Load settings from file.
             """
         if path.exists(self.config_file):
             self.config.read(self.config_file)
+            return True
+        return False
 
     def save(self):
         """ Save settings to file.
@@ -83,8 +94,13 @@ class Settings:
             """
         return str(self.config.sections())
 
+
 config = Settings()
-config.load()
+found = config.load()
+
 
 if __name__ == '__main__':
+    if not found:
+        config.defaults()
+        config.save()
     print(config)

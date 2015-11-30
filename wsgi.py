@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""WSGI config for PiCam project.
+""" WSGI config for PiCam project.
 
 The aim of mod_wsgi is to implement a simple to use Apache module which can host any Python application which supports
 the Python WSGI interface. The module would be suitable for use in hosting high performance production web sites, as
@@ -13,7 +13,7 @@ apache2.conf:
         WSGIScriptAlias /        /usr/local/PiCam/wsgi.py
         Alias           /static/ /usr/local/PiCam/static/
     </VirtualHost>
-"""
+    """
 
 from os import path
 import bottle
