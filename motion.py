@@ -41,7 +41,7 @@ class MotionCapture:
     testHeight = 75
     frequency = 5  # passive time between two detections
     short_duration = 15  # capture short video duration is seconds
-    long_duration = 120  # capture long video duration in seconds
+    long_duration = 60  # capture long video duration in seconds
 
     def __init__(self, image_dir: str, is_day: bool = True):
         self.last_video = 0
@@ -195,6 +195,8 @@ class MotionDaemon(DaemonBase):
                     """.format(file, platform.node(), size, diff)
                     with Database() as db:
                         db.dml(insert)
+        except (KeyboardInterrupt, SystemExit):
+            pass
         finally:
             print("No longer detecting motion.")
 

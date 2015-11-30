@@ -154,7 +154,7 @@ class CameraDaemon(DaemonBase):
                 try:
                     print("Serving on {}".format(socket.getsockname()))
                     server.serve_forever()
-                except KeyboardInterrupt:
+                except (KeyboardInterrupt, SystemExit):
                     break
                 except:
                     print(traceback.format_exc(), file=sys.stderr)

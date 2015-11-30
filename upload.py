@@ -31,7 +31,7 @@ class UploadDaemon(DaemonBase):
     """ Dropbox upload daemon.
         """
 
-    max_size = 1024 ** 3 // 2
+    max_size = 2 * (1024 ** 3)
     access_token = settings.config.access_token
 
     def __init__(self, directory: str):
@@ -99,7 +99,10 @@ class UploadDaemon(DaemonBase):
                      WHERE file = '{}'
                     """.format(share['url'], full_name)
                     db.dml(update)
-                mknod(upl_name)
+                try:
+                    mknod(upl_name)
+                except FileExistsError:
+                    pass
 
     def _rotate(self, client: DropboxClient, files: list):
         """  Rotate Dropbox in order to save storage.
@@ -130,6 +133,8 @@ class UploadDaemon(DaemonBase):
                 else:
                     self._upload(client, files)
                     self._rotate(client, files)
+        except (KeyboardInterrupt, SystemExit):
+            pass
         finally:
             print("No longer uploading from {} to Dropbox.".format(self.directory))
 
