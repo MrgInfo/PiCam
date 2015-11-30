@@ -76,7 +76,7 @@ class Settings:
         self.config.set('Database', 'User', 'picam')
         self.config.set('Database', 'Password', '')
         self.config.add_section('Dropbox')
-        self.config.set('Dropbox', 'Access', None)
+        self.config.set('Dropbox', 'Access', '')
 
     def load(self):
         """ Load settings from file.
