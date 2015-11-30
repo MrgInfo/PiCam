@@ -5,6 +5,7 @@
 
 from bottle import route, view
 from urllib3 import PoolManager, Timeout, exceptions
+from hurry.filesize import size
 
 from utils.database import Database
 
@@ -60,8 +61,8 @@ def home():
             return {'events': []}
         else:
             events = [
-                {'time': time, 'camera': location, 'size': size, 'url': url}
-                for (file, location, time, size, url)
+                {'time': time, 'camera': location, 'size': size(file_size), 'url': url}
+                for (file, location, time, file_size, url)
                 in data
             ]
             return {'events': events}
