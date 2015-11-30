@@ -69,10 +69,13 @@ class Settings:
     def defaults(self):
         """ Default settings.
             """
+        self.config.add_section('Main')
         self.config.set('Main', 'WorkingDir', '/var/local/PiCam')
+        self.config.add_section('Database')
         self.config.set('Database', 'Host', 'localhost')
         self.config.set('Database', 'User', 'picam')
         self.config.set('Database', 'Password', '')
+        self.config.add_section('Dropbox')
         self.config.set('Dropbox', 'Access', None)
 
     def load(self):
