@@ -31,6 +31,7 @@ class UploadDaemon(DaemonBase):
     """ Dropbox upload daemon.
         """
 
+    first_time = False
     max_size = 2 * (1024 ** 3)
     access_token = settings.config.access_token
 
@@ -50,6 +51,7 @@ class UploadDaemon(DaemonBase):
             code = input("4. Enter the authorization code here: ").strip()
             self.access_token, user_id = flow.finish(code)
             settings.config.access_token = self.access_token
+            self.first_time = True
 
     @staticmethod
     def _get(client: DropboxClient) -> list:
@@ -122,6 +124,8 @@ class UploadDaemon(DaemonBase):
     def run(self):
         """ Upload logic.
             """
+        if self.first_time:
+            return
         print("Uploading from {} to Dropbox.".format(self.directory))
         try:
             # noinspection PyDeprecation
