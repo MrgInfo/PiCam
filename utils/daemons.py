@@ -4,6 +4,7 @@
 """ In one of my project I need to program in Python 3 daemon.
     """
 
+from abc import abstractmethod
 import sys
 import time
 import traceback
@@ -30,14 +31,14 @@ class DaemonBase:
 
     def __init__(self):
         self.stdin_path = '/dev/null'
-        self.stdout_path = '/var/log/PiCam/{}.log'.format(self.__class__.__name__)
-        self.stderr_path = '/var/log/PiCam/{}.err'.format(self.__class__.__name__)
+        self.stdout_path = '/dev/tty'
+        self.stderr_path = '/dev/tty'
         # noinspection SpellCheckingInspection
         self.pidfile_path = '/var/run/{}.pid'.format(self.__class__.__name__)
         # noinspection SpellCheckingInspection
         self.pidfile_timeout = 5
 
-    # noinspection PyMethodMayBeStatic
+    @abstractmethod
     def run(self):
         """ You should override this method when you subclass Daemon.
             It will be called after the process has been daemonized by start() or restart().
@@ -45,10 +46,12 @@ class DaemonBase:
         Example:
 
         class MyDaemon(DaemonBase):
-            def run(self):
+            try:
                 while True:
                     time.sleep(1)
-        """
+            except (KeyboardInterrupt, SystemExit):
+                pass
+            """
 
 
 class TwinkleDaemon(DaemonBase):
@@ -56,9 +59,12 @@ class TwinkleDaemon(DaemonBase):
         """
 
     def run(self):
-        while True:
-            time.sleep(1)
-            print('Twinkle')
+        try:
+            while True:
+                time.sleep(1)
+                print('Twinkle')
+        except (KeyboardInterrupt, SystemExit):
+            pass
 
 
 def _interactive(a_daemon: DaemonBase):
