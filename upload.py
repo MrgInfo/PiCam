@@ -15,7 +15,7 @@ from urllib3.exceptions import MaxRetryError
 
 from utils import settings
 from utils.daemons import DaemonBase, init
-from utils.database import Database
+from utils.database import DatabaseConnection
 
 __author__ = "wavezone"
 __copyright__ = "Copyright 2015, MRG-Infó Bt."
@@ -92,8 +92,8 @@ class UploadDaemon(DaemonBase):
                         share = client.share(local_name)
                     except (MaxRetryError, ErrorResponse):
                         continue
-                print("%s was uploaded to Dropbox." % filename)
-                with Database() as db:
+                print("{} was uploaded to Dropbox.".format(filename))
+                with DatabaseConnection() as db:
                     update = """
                     UPDATE events
                        SET url = '{}',

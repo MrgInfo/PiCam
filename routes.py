@@ -7,7 +7,7 @@ from bottle import route, view
 from urllib3 import PoolManager, Timeout, exceptions
 from hurry.filesize import size
 
-from utils.database import Database
+from utils.database import DatabaseConnection
 
 __author__ = "wavezone"
 __copyright__ = "Copyright 2015, MRG-Infó Bt."
@@ -48,7 +48,7 @@ def _streams():
 def home():
     """ Events.
         """
-    with Database() as database:
+    with DatabaseConnection() as database:
         data = database.query("""
         SELECT file,
                location,

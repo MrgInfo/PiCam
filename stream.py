@@ -57,7 +57,7 @@ class CamHandler(BaseHTTPRequestHandler):
             camera.resolution = (1280, 720)
             camera.framerate = 30
             now = datetime.datetime.now()
-            camera.annotate_text = "{:%Y-%m-%d %H:%M:%S}".format(now)
+            camera.annotate_text = now.strftime("%Y-%m-%d %H:%M:%S")
             time.sleep(2)  # Camera warm-up time
             try:
                 for _ in camera.capture_continuous(data, 'jpeg'):
@@ -74,7 +74,7 @@ class CamHandler(BaseHTTPRequestHandler):
                     data.seek(0)
                     data.truncate()
                     now = datetime.datetime.now()
-                    camera.annotate_text = "{:%Y-%m-%d %H:%M:%S}".format(now)
+                    camera.annotate_text = now.strftime("%Y-%m-%d %H:%M:%S")
                     time.sleep(.2)
             except IOError as e:
                 # noinspection SpellCheckingInspection

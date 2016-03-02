@@ -22,10 +22,11 @@ __version__ = "1.0.1"
 __maintainer__ = "Groma István"
 __email__ = "wavezone@mrginfo.com"
 
-__all__ = ['Database']
+__all__ = ['DatabaseConnection']
 
 
-class Database:
+# noinspection PyPep8Naming
+class DatabaseConnection:
     """ Wrapper class for database.
         """
 
@@ -91,7 +92,7 @@ class Database:
 
 
 if __name__ == '__main__':
-    database = Database()
+    database = DatabaseConnection()
     events = """
     SELECT *
       FROM events

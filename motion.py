@@ -15,7 +15,7 @@ import picamera.array
 
 from utils import settings
 from utils.daemons import DaemonBase, init
-from utils.database import Database
+from utils.database import DatabaseConnection
 
 __author__ = "wavezone"
 __copyright__ = "Copyright 2015, MRG-Infó Bt."
@@ -57,7 +57,7 @@ class MotionCapture:
         if not os.path.exists(self.image_dir):
             os.makedirs(self.image_dir)
         now = datetime.datetime.now()
-        return os.path.join(self.image_dir, "{:%Y%m%d-%H%M%S}.h264".format(now))
+        return os.path.join(self.image_dir, "{}.h264".format(now.strftime("%Y%m%d-%H%M%S")))
 
     def __capture(self, duration: int):
         try:
@@ -193,7 +193,7 @@ class MotionDaemon(DaemonBase):
                         {},
                         current_timestamp)
                     """.format(file, platform.node(), size, diff)
-                    with Database() as db:
+                    with DatabaseConnection() as db:
                         db.dml(insert)
         except (KeyboardInterrupt, SystemExit):
             pass
