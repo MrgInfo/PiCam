@@ -72,13 +72,13 @@ class UploadDaemon(DaemonBase):
     def _upload(self, client: DropboxClient):
         """ Upload new files from directory.
             """
+        now = time()
         for filename in listdir(self.directory):
             if fnmatch(filename, '*.upl'):
                 continue
             local_name = '/' + filename
             full_name = path.join(self.directory, filename)
             upl_name = "{}.upl".format(full_name)
-            now = time()
             if path.isfile(upl_name) and stat(full_name).st_mtime < now - 5 * 60:
                 with open(full_name, 'rb') as file_stream:
                     try:
@@ -122,18 +122,18 @@ class UploadDaemon(DaemonBase):
             return
         print("Uploading from {} to Dropbox.".format(self.directory))
         try:
-            # noinspection PyDeprecation
             client = DropboxClient(self.access_token)
             while True:
                 self._upload(client)
                 files = self._get(client)
                 if files is not None:
                     self._rotate(client, files)
+                print("Going idle...", end='')
                 sleep(2 * 60)
+                print("DONE")
         except (KeyboardInterrupt, SystemExit):
-            pass
-        finally:
             print()
+        finally:
             print("No longer uploading from {} to Dropbox.".format(self.directory))
 
 
