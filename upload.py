@@ -134,7 +134,7 @@ class UploadDaemon(DaemonBase):
             client = DropboxClient(self.access_token)
             while True:
                 files = self._get(client)
-                if files is None or files is []:
+                if files is None:
                     sleep(5 * 60)
                 else:
                     self._upload(client, files)
@@ -142,6 +142,7 @@ class UploadDaemon(DaemonBase):
         except (KeyboardInterrupt, SystemExit):
             pass
         finally:
+            print()
             print("No longer uploading from {} to Dropbox.".format(self.directory))
 
 
