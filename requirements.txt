@@ -5,7 +5,7 @@ hurry.filesize==0.9
 lockfile==0.12.2
 picamera==1.12
 PyMySQL==0.7.6
-python-daemon==2.1.1
+python-daemon-3K==1.5.8
 requests==2.10.0
 six==1.10.0
 urllib3==1.16
