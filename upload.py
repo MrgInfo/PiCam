@@ -6,19 +6,17 @@
 
 from fnmatch import fnmatch
 from operator import itemgetter
-from os import listdir, path, mknod
-from time import strptime, sleep
-
+from os import listdir, path, mknod, stat
+from time import strptime, sleep, time
 from dropbox.client import DropboxClient, DropboxOAuth2FlowNoRedirect
 from dropbox.rest import ErrorResponse
 from urllib3.exceptions import MaxRetryError
-
 from utils import settings
 from utils.daemons import DaemonBase, init
 from utils.database import DatabaseConnection
 
 __author__ = "wavezone"
-__copyright__ = "Copyright 2015, MRG-Infó Bt."
+__copyright__ = "Copyright 2016, MRG-Infó Bt."
 __credits__ = ["Groma István (wavezone)"]
 
 __license__ = "GPL"
@@ -71,8 +69,7 @@ class UploadDaemon(DaemonBase):
             if not m['is_dir']
         ]
 
-    # noinspection PyTypeChecker
-    def _upload(self, client: DropboxClient, files: list):
+    def _upload(self, client: DropboxClient):
         """ Upload new files from directory.
             """
         for filename in listdir(self.directory):
@@ -81,19 +78,14 @@ class UploadDaemon(DaemonBase):
             local_name = '/' + filename
             full_name = path.join(self.directory, filename)
             upl_name = "{}.upl".format(full_name)
-            found = False
-            for f in files:
-                if f['file'] == local_name:
-                    found = True
-                    break
-            if not found and not path.isfile(upl_name):
+            now = time()
+            if path.isfile(upl_name) and stat(full_name).st_mtime < now - 5 * 60:
                 with open(full_name, 'rb') as file_stream:
                     try:
                         client.put_file(local_name, file_stream)
                         share = client.share(local_name)
                     except (MaxRetryError, ErrorResponse):
                         continue
-                print("{} was uploaded to Dropbox.".format(filename))
                 with DatabaseConnection() as db:
                     update = """
                     UPDATE events
@@ -106,8 +98,8 @@ class UploadDaemon(DaemonBase):
                     mknod(upl_name)
                 except FileExistsError:
                     pass
+                print("{} was uploaded to Dropbox.".format(filename))
 
-    # noinspection PyTypeChecker
     def _rotate(self, client: DropboxClient, files: list):
         """  Rotate Dropbox in order to save storage.
             """
@@ -133,12 +125,11 @@ class UploadDaemon(DaemonBase):
             # noinspection PyDeprecation
             client = DropboxClient(self.access_token)
             while True:
+                self._upload(client)
                 files = self._get(client)
-                if files is None:
-                    sleep(5 * 60)
-                else:
-                    self._upload(client, files)
+                if files is not None:
                     self._rotate(client, files)
+                sleep(2 * 60)
         except (KeyboardInterrupt, SystemExit):
             pass
         finally:
