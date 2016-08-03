@@ -1,0 +1,11 @@
+bottle==0.12.9
+docutils==0.12
+dropbox==6.6.0
+hurry.filesize==0.9
+lockfile==0.12.2
+picamera==1.12
+PyMySQL==0.7.6
+python-daemon==2.1.1
+requests==2.10.0
+six==1.10.0
+urllib3==1.16

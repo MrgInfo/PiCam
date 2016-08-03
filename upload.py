@@ -71,6 +71,7 @@ class UploadDaemon(DaemonBase):
             if not m['is_dir']
         ]
 
+    # noinspection PyTypeChecker
     def _upload(self, client: DropboxClient, files: list):
         """ Upload new files from directory.
             """
@@ -106,6 +107,7 @@ class UploadDaemon(DaemonBase):
                 except FileExistsError:
                     pass
 
+    # noinspection PyTypeChecker
     def _rotate(self, client: DropboxClient, files: list):
         """  Rotate Dropbox in order to save storage.
             """

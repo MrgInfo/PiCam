@@ -10,12 +10,11 @@ import io
 import re
 import time
 import traceback
-from http.server import BaseHTTPRequestHandler, HTTPServer
-
-from picamera.exc import PiCameraError
-from websocket_server import ThreadingMixIn
 import picamera
 
+from socketserver import ThreadingMixIn
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from picamera.exc import PiCameraError
 from utils.daemons import DaemonBase, init
 
 __author__ = "wavezone"
