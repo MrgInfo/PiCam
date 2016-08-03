@@ -79,7 +79,7 @@ class UploadDaemon(DaemonBase):
             local_name = '/' + filename
             full_name = path.join(self.directory, filename)
             upl_name = "{}.upl".format(full_name)
-            if path.isfile(upl_name) and stat(full_name).st_mtime < now - 5 * 60:
+            if not path.isfile(upl_name) and stat(full_name).st_mtime < now - 5 * 60:
                 with open(full_name, 'rb') as file_stream:
                     try:
                         client.put_file(local_name, file_stream)
@@ -120,7 +120,7 @@ class UploadDaemon(DaemonBase):
             """
         if self.first_time:
             return
-        print("Uploading from {} to Dropbox.".format(self.directory))
+        print("Uploading from {} to Dropbox.".format(self.directory), flush=True)
         try:
             client = DropboxClient(self.access_token)
             while True:
@@ -128,13 +128,15 @@ class UploadDaemon(DaemonBase):
                 files = self._get(client)
                 if files is not None:
                     self._rotate(client, files)
-                print("Going idle...", end='')
+                print("Going idle...", end='', flush=True)
                 sleep(2 * 60)
-                print("DONE")
-        except (KeyboardInterrupt, SystemExit):
+                print("DONE", flush=True)
+        except KeyboardInterrupt:
             print()
+        except SystemExit:
+            pass
         finally:
-            print("No longer uploading from {} to Dropbox.".format(self.directory))
+            print("No longer uploading from {} to Dropbox.".format(self.directory), flush=True)
 
 
 if __name__ == '__main__':
