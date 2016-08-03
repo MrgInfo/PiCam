@@ -79,7 +79,7 @@ class UploadDaemon(DaemonBase):
             local_name = '/' + filename
             full_name = path.join(self.directory, filename)
             upl_name = "{}.upl".format(full_name)
-            if not path.isfile(upl_name) and stat(full_name).st_mtime < now - 5 * 60:
+            if not path.isfile(upl_name) and stat(full_name).st_mtime < now - 60:
                 with open(full_name, 'rb') as file_stream:
                     try:
                         client.put_file(local_name, file_stream)
