@@ -30,7 +30,7 @@ class UploadDaemon(DaemonBase):
         """
 
     first_time = False
-    max_size = 2 * (1024 ** 3)
+    max_size = 10 * (1024 ** 3)
     access_token = settings.config.access_token
 
     def __init__(self, directory: str):
